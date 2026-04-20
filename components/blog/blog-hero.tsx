@@ -9,7 +9,7 @@ type BlogHeroProps = {
 export function BlogHero({ imageSrc, categoryLabel, postCount }: BlogHeroProps) {
   return (
     <div className="relative w-full overflow-hidden rounded-sm border border-zinc-200/80 dark:border-zinc-800/80">
-      <div className="relative aspect-[16/4] w-full">
+      <div className="relative h-36 w-full sm:h-44 md:h-52 lg:h-56">
         <Image
           src={imageSrc}
           alt={`${categoryLabel} 카테고리 배경 이미지`}
