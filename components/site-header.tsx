@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const nav = [
   { href: "/blog", label: "블로그" },
@@ -13,6 +13,10 @@ const nav = [
 function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  /** true = 가로로 접힘(중간) → 테마 전환 후 펼침 (backdrop-blur 환경에서도 동작) */
+  const [squashed, setSquashed] = useState(false);
+  const busyRef = useRef(false);
+  const layerRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     // 테마 아이콘은 클라이언트에서만 결정 (서버/클라 불일치 방지)
@@ -20,29 +24,86 @@ function ThemeToggle() {
     setMounted(true);
   }, []);
 
+  const isDark = resolvedTheme === "dark";
+
+  const handleToggle = useCallback(() => {
+    const reduceMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (reduceMotion) {
+      setTheme(isDark ? "light" : "dark");
+      return;
+    }
+
+    if (busyRef.current) return;
+    const el = layerRef.current;
+
+    const applyTheme = () => {
+      setTheme(isDark ? "light" : "dark");
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setSquashed(false);
+          busyRef.current = false;
+        });
+      });
+    };
+
+    if (!el) {
+      setTheme(isDark ? "light" : "dark");
+      return;
+    }
+
+    busyRef.current = true;
+    setSquashed(true);
+
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      window.clearTimeout(safety);
+      el.removeEventListener("transitionend", onEnd);
+      applyTheme();
+    };
+
+    const onEnd = (e: TransitionEvent) => {
+      if (e.propertyName !== "transform") return;
+      finish();
+    };
+
+    const safety = window.setTimeout(finish, 400);
+    el.addEventListener("transitionend", onEnd);
+  }, [isDark, setTheme]);
+
   if (!mounted) {
     return (
       <span
-        className="inline-flex h-9 w-9 shrink-0 rounded-lg border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900"
+        className="inline-flex h-9 w-9 shrink-0 rounded-lg border border-zinc-200 bg-transparent dark:border-zinc-700"
         aria-hidden
       />
     );
   }
 
-  const isDark = resolvedTheme === "dark";
-
   return (
     <button
       type="button"
-      onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 text-zinc-800 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+      onClick={handleToggle}
+      className="inline-flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-zinc-200 bg-transparent text-foreground transition-[transform] hover:opacity-80 active:scale-95 active:duration-100 dark:border-zinc-700"
       aria-label={isDark ? "라이트 모드로 전환" : "다크 모드로 전환"}
     >
-      {isDark ? (
-        <SunIcon className="h-[18px] w-[18px]" />
-      ) : (
-        <MoonIcon className="h-[18px] w-[18px]" />
-      )}
+      <span
+        ref={layerRef}
+        className="inline-flex h-[18px] w-[18px] origin-center will-change-transform transition-[transform] duration-[240ms] ease-in-out motion-reduce:transition-none motion-reduce:duration-0"
+        style={{
+          transform: squashed ? "scaleX(0)" : "scaleX(1)",
+        }}
+      >
+        {isDark ? (
+          <SunIcon className="h-[18px] w-[18px]" aria-hidden />
+        ) : (
+          <MoonIcon className="h-[18px] w-[18px]" aria-hidden />
+        )}
+      </span>
     </button>
   );
 }
