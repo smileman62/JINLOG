@@ -19,7 +19,7 @@ export function BlogHero({ imageSrc, categoryLabel, postCount }: BlogHeroProps) 
           className="object-cover"
         />
         <div
-          className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/25"
+          className="absolute inset-0 bg-linear-to-t from-black/85 via-black/45 to-black/25"
           aria-hidden
         />
         <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-6">
