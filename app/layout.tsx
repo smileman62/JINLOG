@@ -10,7 +10,7 @@ const geistMono = Geist_Mono({
 
 const gaegu = Gaegu({
   variable: "--font-gaegu",
-  subsets: ["korean", "latin"],
+  subsets: ["latin"],
   weight: ["400", "700"],
 });
 
