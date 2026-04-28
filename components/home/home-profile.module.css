@@ -186,9 +186,9 @@
   }
 
   .about {
-    left: calc(50% - 370px);
+    left: calc(50% - 350px);
     top: 3%;
-    width: 210px;
+    width: 190px;
   }
 
   .phil {
@@ -257,9 +257,9 @@
   }
 
   .about {
-    left: calc(50% - 440px);
+    left: calc(50% - 420px);
     top: 5%;
-    width: 260px;
+    width: 210px;
   }
 
   .phil {
@@ -280,7 +280,7 @@
   }
 
   .stack {
-    left: calc(50% + 200px);
+    left: calc(50% + 210px);
     width: 280px;
   }
 
@@ -327,9 +327,9 @@
   }
 
   .about {
-    left: calc(50% - 520px);
+    left: calc(50% - 480px);
     top: 7%;
-    width: 300px;
+    width: 220px;
   }
 
   .phil {
@@ -402,7 +402,7 @@
 
   .about {
     order: 2;
-    width: min(70%, 220px);
+    width: min(70%, 180px);
     margin-right: 5%;
     align-self: flex-end;
   }

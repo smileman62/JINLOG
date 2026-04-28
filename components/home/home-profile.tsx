@@ -69,6 +69,7 @@ function pickRandomSource(excluding: Set<string>) {
 export function HomeProfile() {
   const [isRainEnabled, setIsRainEnabled] = useState(true);
   const [rainStickers, setRainStickers] = useState<RainSticker[]>([]);
+  const spaceMonoStyle = { fontFamily: "var(--font-space-mono), monospace" } as const;
 
   useEffect(() => {
     const shuffledSources = shuffle(rainStickerSources);
@@ -161,7 +162,10 @@ export function HomeProfile() {
           style={{ animationDelay: "0.06s" }}
         >
           <div className={styles.tape} />
-          <p className="text-sm leading-relaxed text-zinc-800 md:text-md lg:text-lg">
+          <p
+            className="text-md text-zinc-800 md:text-lg lg:text-xl"
+            style={{ fontFamily: "var(--font-gaegu), cursive" }}
+          >
             🖥️ 사용자 시각에서
             <br />
             먼저 생각하는
@@ -175,7 +179,12 @@ export function HomeProfile() {
           style={{ animationDelay: "0.14s" }}
         >
           <div className={styles.tape} />
-          <div className="text-xs uppercase tracking-[0.16em] text-zinc-400 md:text-sm">// Philosophy</div>
+          <div
+            className="text-xs uppercase tracking-[0.16em] text-zinc-400 lg:text-sm"
+            style={spaceMonoStyle}
+          >
+            {"// Philosophy"}
+          </div>
           <p className="mt-2 text-sm leading-relaxed text-zinc-700 md:text-md lg:text-lg">
             기능 구현에 그치지 않고
             <br />
@@ -190,7 +199,12 @@ export function HomeProfile() {
           style={{ animationDelay: "0.22s" }}
         >
           <div className={styles.tape} />
-          <div className="text-xs uppercase tracking-[0.16em] text-white/60 md:text-sm">// Awards</div>
+          <div
+            className="text-xs uppercase tracking-[0.16em] text-white/60 lg:text-sm"
+            style={spaceMonoStyle}
+          >
+            {"// Awards"}
+          </div>
           <div className="mt-2 space-y-1 text-xs text-white/90 md:text-sm lg:text-base">
             <p>✦ UMC 데모데이 최우수상</p>
             <p>✦ 서울시 AIoT 해커톤 장려상</p>
@@ -208,9 +222,9 @@ export function HomeProfile() {
             KIM JINSEONG · FRONTEND
           </div>
           <h1 className="mt-3 text-[34px] font-black leading-[1.1] md:text-[42px] lg:text-[56px] xl:text-[64px]">
-            <span className="text-[#ff5252]">안녕하세요,</span>
+            <span className="text-[#0b89ff]">안녕하세요,</span>
             <br />
-            <span className="text-[#c9f135] [text-shadow:0_0_16px_rgba(201,241,53,0.45)]">
+            <span className="text-[#00e768] [text-shadow:0_0_16px_rgba(0,231,104,0.45)]">
               개발자
             </span>
             <br />
@@ -224,7 +238,7 @@ export function HomeProfile() {
           <div className="mt-4 flex items-center gap-2">
             <a
               href="/blog"
-              className="rounded-full bg-[#c9f135] px-3 py-1.5 text-xs font-bold text-zinc-900 transition-transform hover:scale-105 md:px-4 md:py-2 md:text-sm lg:text-base"
+              className="rounded-full bg-[#01ccff] px-3 py-1.5 text-xs font-bold text-zinc-900 transition-transform hover:scale-105 md:px-4 md:py-2 md:text-sm lg:text-base"
             >
               글 보러가기 →
             </a>
@@ -241,16 +255,21 @@ export function HomeProfile() {
 
         <div
           className={`${styles.sticker} ${styles.stack} rounded-[14px] bg-[#c4adff] px-5 py-4`}
-          style={{ animationDelay: "0.1s" }}
+          style={{ animationDelay: "0.1s", ...spaceMonoStyle }}
         >
           <div className={styles.tape} />
-          <div className="text-xs uppercase tracking-[0.16em] text-zinc-700 md:text-sm">// Stack</div>
+          <div
+            className="text-xs uppercase tracking-[0.16em] text-zinc-700 lg:text-sm"
+            style={spaceMonoStyle}
+          >
+            {"// Stack"}
+          </div>
           <div className="mt-2 flex flex-wrap gap-1.5 text-xs md:text-sm lg:text-base">
             {["React", "Next.js", "TypeScript", "TanStack Query", "Zustand", "Tailwind", "Axios"].map(
               (tag) => (
                 <span
                   key={tag}
-                  className="rounded-md border border-white/80 bg-white/60 px-2 py-0.5 font-medium text-zinc-900"
+                  className="text-xs lg:text-sm rounded-md border border-white/80 bg-white/60 px-2 py-0.5 font-medium text-zinc-900"
                 >
                   {tag}
                 </span>
@@ -264,7 +283,12 @@ export function HomeProfile() {
           style={{ animationDelay: "0.18s" }}
         >
           <div className={styles.tape} />
-          <div className="text-xs uppercase tracking-[0.16em] text-zinc-700 md:text-sm">// Projects</div>
+          <div
+            className="text-xs uppercase tracking-[0.16em] text-zinc-700 lg:text-sm"
+            style={spaceMonoStyle}
+          >
+            {"// Projects"}
+          </div>
           <div className="mt-2 space-y-2">
             <div>
               <p className="text-sm font-bold text-zinc-900 md:text-base lg:text-lg">마음모음</p>
@@ -290,7 +314,12 @@ export function HomeProfile() {
           style={{ animationDelay: "0.26s" }}
         >
           <div className={styles.tape} />
-          <div className="text-xs uppercase tracking-[0.16em] text-zinc-700 md:text-sm">// Education</div>
+          <div
+            className="text-xs uppercase tracking-[0.16em] text-zinc-700 lg:text-sm"
+            style={spaceMonoStyle}
+          >
+            {"// Education"}
+          </div>
           <p className="mt-2 text-sm font-bold text-zinc-900 md:text-base lg:text-lg">가천대학교</p>
           <p className="text-xs text-zinc-700/70 md:text-sm lg:text-base">소프트웨어학과 · 2026.08 졸업예정</p>
           <div className="mt-2 flex items-end gap-1">
@@ -305,7 +334,12 @@ export function HomeProfile() {
           style={{ animationDelay: "0.48s" }}
         >
           <div className={styles.tapeSm} />
-          <div className="text-xs uppercase tracking-[0.16em] text-zinc-400 md:text-sm">// Certs</div>
+          <div
+            className="text-xs uppercase tracking-[0.16em] text-zinc-400 lg:text-sm"
+            style={spaceMonoStyle}
+          >
+            {"// Certs"}
+          </div>
           <div className="mt-2 space-y-1 text-xs text-zinc-700 md:text-sm lg:text-base">
             <p>📜 정보처리기사</p>
             <p>📊 ADsP · SQLD</p>
