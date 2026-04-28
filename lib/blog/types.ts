@@ -3,10 +3,12 @@ export type PostCategory = "react" | "nextjs";
 export type BlogCategoryFilter = "all" | PostCategory;
 
 export type BlogPost = {
-  id: string;
   slug: string;
   title: string;
+  description: string;
+  tags: string[];
+  cover?: string;
   category: PostCategory;
   publishedAt: string;
-  commentCount: number;
+  body: unknown;
 };
