@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "프로젝트",
+  description: "김진성의 프로젝트 모음",
+};
+
 export default function ProjectsPage() {
   return (
     <div className="mx-auto max-w-2xl">
