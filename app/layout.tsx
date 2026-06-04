@@ -21,8 +21,6 @@ const spaceMono = Space_Mono({
   weight: ["400", "700"],
 });
 
-const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
-
 export const metadata: Metadata = {
   metadataBase: getSiteUrl(),
   title: {
@@ -59,9 +57,11 @@ export const metadata: Metadata = {
       follow: true,
     },
   },
-  ...(googleVerification
-    ? { verification: { google: googleVerification } }
-    : {}),
+  verification: {
+    google:
+      process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ??
+      "opxNdeNCNwJIc4fLIfNnmpJBdJsOKq7s2aMs5oqP0A8",
+  },
 };
 
 export default function RootLayout({
