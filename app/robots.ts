@@ -1,15 +1,8 @@
 import type { MetadataRoute } from "next";
-
-function getSiteOrigin() {
-  const rawUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    process.env.VERCEL_PROJECT_PRODUCTION_URL ??
-    "https://jinlog.vercel.app";
-  return rawUrl.startsWith("http") ? rawUrl : `https://${rawUrl}`;
-}
+import { resolveSiteUrl } from "@/lib/site";
 
 export default function robots(): MetadataRoute.Robots {
-  const siteOrigin = getSiteOrigin();
+  const siteOrigin = resolveSiteUrl();
 
   return {
     rules: {

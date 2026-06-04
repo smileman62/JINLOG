@@ -3,6 +3,7 @@ import { BlogCategoryTabs } from "@/components/blog/blog-category-tabs";
 import { BlogHero } from "@/components/blog/blog-hero";
 import { BlogPagination } from "@/components/blog/blog-pagination";
 import { BlogPostList } from "@/components/blog/blog-post-list";
+import { JsonLd } from "@/components/seo/json-ld";
 import {
   allPosts,
   categoryHeroImage,
@@ -13,9 +14,31 @@ import {
   parsePage,
   POSTS_PER_PAGE,
 } from "@/lib/blog/data";
+import { blogPageJsonLd } from "@/lib/seo";
+import { siteName } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "블로그",
+  title: "블로그 | React·Next.js 기술 글",
+  description:
+    "김진성(JINLOG)의 React, Next.js, TypeScript 학습·프로젝트 기록. 프론트엔드 개발 블로그 글 목록.",
+  keywords: [
+    "김진성 블로그",
+    "JINLOG",
+    "React 블로그",
+    "Next.js 블로그",
+    "프론트엔드",
+    "TypeScript",
+  ],
+  alternates: {
+    canonical: "/blog",
+  },
+  openGraph: {
+    title: `블로그 · ${siteName}`,
+    description:
+      "React, Next.js, TypeScript를 다루는 김진성의 기술 블로그.",
+    url: "/blog",
+    type: "website",
+  },
 };
 
 function firstString(
@@ -40,6 +63,7 @@ export default async function BlogPage(props: PageProps<"/blog">) {
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
+      <JsonLd data={blogPageJsonLd()} />
       <BlogHero
         imageSrc={categoryHeroImage[category]}
         categoryLabel={categoryLabels[category]}

@@ -1,16 +1,8 @@
 import type { Metadata } from "next";
 import { Gaegu, Geist_Mono, Space_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import { getSiteUrl, siteDescription, siteName } from "@/lib/site";
 import "./globals.css";
-
-function getSiteUrl() {
-  const rawUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    process.env.VERCEL_PROJECT_PRODUCTION_URL ??
-    "https://jinlog.vercel.app";
-  const withProtocol = rawUrl.startsWith("http") ? rawUrl : `https://${rawUrl}`;
-  return new URL(withProtocol);
-}
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -29,33 +21,47 @@ const spaceMono = Space_Mono({
   weight: ["400", "700"],
 });
 
+const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
+
 export const metadata: Metadata = {
   metadataBase: getSiteUrl(),
   title: {
-    default: "JINLOG",
-    template: "%s · JINLOG",
+    default: `${siteName} | 김진성 프론트엔드 개발자`,
+    template: `%s · ${siteName}`,
   },
-  description: "개인 블로그와 프로젝트 기록",
-  alternates: {
-    canonical: "/",
-  },
+  description: siteDescription,
+  keywords: [
+    "JINLOG",
+    "김진성",
+    "프론트엔드",
+    "React",
+    "Next.js",
+    "TypeScript",
+    "개발 블로그",
+  ],
   openGraph: {
-    title: "JINLOG",
-    description: "개인 블로그와 프로젝트 기록",
-    url: "/",
-    siteName: "JINLOG",
+    title: `${siteName} | 김진성 프론트엔드 개발자`,
+    description: siteDescription,
+    siteName,
     locale: "ko_KR",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "JINLOG",
-    description: "개인 블로그와 프로젝트 기록",
+    title: `${siteName} | 김진성 프론트엔드 개발자`,
+    description: siteDescription,
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
   },
+  ...(googleVerification
+    ? { verification: { google: googleVerification } }
+    : {}),
 };
 
 export default function RootLayout({

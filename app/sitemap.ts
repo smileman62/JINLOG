@@ -1,18 +1,12 @@
 import type { MetadataRoute } from "next";
-
-function getSiteOrigin() {
-  const rawUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    process.env.VERCEL_PROJECT_PRODUCTION_URL ??
-    "https://jinlog.vercel.app";
-  return rawUrl.startsWith("http") ? rawUrl : `https://${rawUrl}`;
-}
+import { allPosts } from "@/lib/blog/data";
+import { resolveSiteUrl } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const siteOrigin = getSiteOrigin();
+  const siteOrigin = resolveSiteUrl();
   const now = new Date();
 
-  return [
+  const staticPages: MetadataRoute.Sitemap = [
     {
       url: `${siteOrigin}/`,
       lastModified: now,
@@ -32,4 +26,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
   ];
+
+  const postPages: MetadataRoute.Sitemap = allPosts.map((post) => ({
+    url: `${siteOrigin}/blog/${post.slug}`,
+    lastModified: new Date(post.publishedAt),
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  }));
+
+  return [...staticPages, ...postPages];
 }
