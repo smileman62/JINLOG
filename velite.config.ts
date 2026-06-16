@@ -1,4 +1,14 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { defineCollection, defineConfig, s } from "velite";
+import rehypePrettyCode from "rehype-pretty-code";
+
+const jinlogLight = JSON.parse(
+  readFileSync(join(process.cwd(), "lib/shiki/jinlog-light.json"), "utf-8"),
+);
+const jinlogDark = JSON.parse(
+  readFileSync(join(process.cwd(), "lib/shiki/jinlog-dark.json"), "utf-8"),
+);
 
 const posts = defineCollection({
   name: "Post",
@@ -20,6 +30,23 @@ export default defineConfig({
   output: {
     data: ".velite",
     clean: true,
+  },
+  mdx: {
+    rehypePlugins: [
+      [
+        rehypePrettyCode,
+        {
+          theme: {
+            light: jinlogLight,
+            dark: jinlogDark,
+          },
+          keepBackground: false,
+          defaultLang: "plaintext",
+          bypassInlineCode: true,
+          grid: true,
+        },
+      ],
+    ],
   },
   collections: { posts },
 });

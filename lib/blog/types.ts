@@ -10,5 +10,5 @@ export type BlogPost = {
   cover?: string;
   category: PostCategory;
   publishedAt: string;
-  body: unknown;
+  body: string;
 };

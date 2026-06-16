@@ -42,3 +42,53 @@
   display: none;
 }
 
+/* MDX code blocks — Shiki dual theme (next-themes .dark class) */
+[data-rehype-pretty-code-figure] {
+  margin-bottom: 1.25rem;
+}
+
+[data-rehype-pretty-code-figure] pre {
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  border: 1px solid #e4e4e7;
+  background-color: #fafafa;
+  padding: 0.875rem 1rem;
+  font-size: 0.8125rem;
+  line-height: 1.625;
+}
+
+.dark [data-rehype-pretty-code-figure] pre {
+  border-color: #27272a;
+  background-color: #09090b;
+}
+
+[data-rehype-pretty-code-figure] code {
+  display: grid;
+  font-family: var(--font-mono);
+}
+
+[data-rehype-pretty-code-figure] span[data-line] {
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+/* 토큰별 색상: span 인라인 --shiki-light / --shiki-dark 변수 사용 */
+code[data-theme*=" "],
+code[data-theme*=" "] span {
+  color: var(--shiki-light) !important;
+  background-color: transparent !important;
+  font-style: var(--shiki-light-font-style);
+  font-weight: var(--shiki-light-font-weight);
+  text-decoration: var(--shiki-light-text-decoration);
+}
+
+.dark code[data-theme*=" "],
+.dark code[data-theme*=" "] span {
+  color: var(--shiki-dark) !important;
+  background-color: transparent !important;
+  font-style: var(--shiki-dark-font-style);
+  font-weight: var(--shiki-dark-font-weight);
+  text-decoration: var(--shiki-dark-text-decoration);
+}
+
