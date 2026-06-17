@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Gaegu, Geist_Mono, Space_Mono } from "next/font/google";
+import { Gaegu, Geist_Mono, Noto_Serif_KR, Space_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { getSiteUrl, siteDescription, siteName } from "@/lib/site";
 import "./globals.css";
@@ -19,6 +19,12 @@ const spaceMono = Space_Mono({
   variable: "--font-space-mono",
   subsets: ["latin"],
   weight: ["400", "700"],
+});
+
+const notoSerifKr = Noto_Serif_KR({
+  variable: "--font-noto-serif-kr",
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -73,7 +79,7 @@ export default function RootLayout({
     <html
       lang="ko"
       suppressHydrationWarning
-      className={`${geistMono.variable} ${gaegu.variable} ${spaceMono.variable}`}
+      className={`${geistMono.variable} ${gaegu.variable} ${spaceMono.variable} ${notoSerifKr.variable}`}
     >
       <body>
         <ThemeProvider>{children}</ThemeProvider>

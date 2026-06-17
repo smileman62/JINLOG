@@ -162,7 +162,9 @@ export function SiteHeader() {
           >
             {nav.map(({ href, label }) => {
               const active =
-                pathname === href || pathname.startsWith(`${href}/`);
+                href === "/blog"
+                  ? pathname === "/blog" || pathname.startsWith("/blog/")
+                  : pathname === href || pathname.startsWith(`${href}/`);
               return (
                 <Link
                   key={href}

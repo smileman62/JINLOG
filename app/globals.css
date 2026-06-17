@@ -20,6 +20,8 @@
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, "SF Mono", Menlo,
     Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-serif: var(--font-noto-serif-kr), "Noto Serif KR", ui-serif, Georgia,
+    "Times New Roman", serif;
 }
 
 @layer base {

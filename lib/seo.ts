@@ -33,6 +33,20 @@ export function homePageJsonLd() {
   };
 }
 
+export function blogPostsPageJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    url: absoluteUrl("/blog/posts"),
+    name: `${siteName} 블로그 전체 글`,
+    description:
+      "React, Next.js, TypeScript를 다루는 김진성의 기술 블로그 글 목록.",
+    inLanguage: "ko-KR",
+    author: { "@id": personId() },
+    isPartOf: { "@id": blogId() },
+  };
+}
+
 export function blogPageJsonLd() {
   return {
     "@context": "https://schema.org",
@@ -41,7 +55,7 @@ export function blogPageJsonLd() {
     url: absoluteUrl("/blog"),
     name: `${siteName} 블로그`,
     description:
-      "React, Next.js, TypeScript를 다루는 김진성의 기술 블로그 글 목록.",
+      "React, Next.js, TypeScript를 다루는 김진성의 기술 블로그.",
     inLanguage: "ko-KR",
     author: { "@id": personId() },
     isPartOf: { "@id": websiteId() },

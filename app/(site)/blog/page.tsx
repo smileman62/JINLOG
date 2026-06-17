@@ -1,26 +1,17 @@
 import type { Metadata } from "next";
-import { BlogCategoryTabs } from "@/components/blog/blog-category-tabs";
-import { BlogHero } from "@/components/blog/blog-hero";
-import { BlogPagination } from "@/components/blog/blog-pagination";
-import { BlogPostList } from "@/components/blog/blog-post-list";
+import { BlogFeaturedPost } from "@/components/blog/blog-featured-post";
+import { BlogRecentPosts } from "@/components/blog/blog-recent-posts";
 import { JsonLd } from "@/components/seo/json-ld";
-import {
-  allPosts,
-  categoryHeroImage,
-  categoryLabels,
-  filterPostsByCategory,
-  paginatePosts,
-  parseCategoryFilter,
-  parsePage,
-  POSTS_PER_PAGE,
-} from "@/lib/blog/data";
+import { allPosts } from "@/lib/blog/data";
 import { blogPageJsonLd } from "@/lib/seo";
 import { siteName } from "@/lib/site";
 
+export const RECENT_POSTS_COUNT = 3;
+
 export const metadata: Metadata = {
-  title: "블로그 | React·Next.js 기술 글",
+  title: "블로그",
   description:
-    "김진성(JINLOG)의 React, Next.js, TypeScript 학습·프로젝트 기록. 프론트엔드 개발 블로그 글 목록.",
+    "김진성(JINLOG)의 React, Next.js, TypeScript 학습·프로젝트 기록. 프론트엔드 개발 블로그.",
   keywords: [
     "김진성 블로그",
     "JINLOG",
@@ -41,41 +32,23 @@ export const metadata: Metadata = {
   },
 };
 
-function firstString(
-  value: string | string[] | undefined,
-): string | undefined {
-  if (typeof value === "string") return value;
-  if (Array.isArray(value)) return value[0];
-  return undefined;
-}
-
-export default async function BlogPage(props: PageProps<"/blog">) {
-  const searchParams = await props.searchParams;
-  const category = parseCategoryFilter(firstString(searchParams.category));
-  const requestedPage = parsePage(firstString(searchParams.page));
-
-  const filtered = filterPostsByCategory(allPosts, category);
-  const { items, totalPages, page } = paginatePosts(
-    filtered,
-    requestedPage,
-    POSTS_PER_PAGE,
-  );
+export default function BlogLandingPage() {
+  const [featured, ...rest] = allPosts;
+  const recentPosts = rest.slice(0, RECENT_POSTS_COUNT);
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8">
+    <div className="mx-auto max-w-6xl">
       <JsonLd data={blogPageJsonLd()} />
-      <BlogHero
-        imageSrc={categoryHeroImage[category]}
-        categoryLabel={categoryLabels[category]}
-        postCount={filtered.length}
-      />
-      <BlogCategoryTabs active={category} />
-      <BlogPostList posts={items} />
-      <BlogPagination
-        category={category}
-        page={page}
-        totalPages={totalPages}
-      />
+
+      {featured ? (
+        <BlogFeaturedPost post={featured} />
+      ) : (
+        <p className="rounded-xl border border-dashed border-zinc-300 px-4 py-16 text-center text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+          아직 게시된 글이 없습니다.
+        </p>
+      )}
+
+      <BlogRecentPosts posts={recentPosts} />
     </div>
   );
 }

@@ -1,0 +1,39 @@
+---
+title: "GitHub Actions로 배포 파이프라인 자동화"
+description: "Next.js 프로젝트에 lint, build, deploy 단계를 추가해 main 브랜치 머지 시 자동 배포되도록 구성하는 방법을 정리합니다."
+date: "2026-02-02"
+tags: ["nextjs"]
+published: true
+cover: "https://images.unsplash.com/photo-1618477388954-7858f032e4da?auto=format&fit=crop&w=1920&h=1080&q=80"
+---
+
+개인 블로그나 포트폴리오를 운영하다 보면, 배포를 수동으로 반복하게 됩니다.
+
+GitHub Actions를 쓰면 **push → 검증 → 배포** 흐름을 자동화할 수 있습니다. 이 글은 그 구조를 잡기 위한 임시 노트입니다.
+
+## 기본 파이프라인
+
+1. PR / push 시 `lint`, `build` 실행
+2. main 브랜치 머지 시 배포 job 실행
+3. 실패 시 알림 또는 PR 상태로 확인
+
+```yaml
+name: CI
+on:
+  push:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm run build
+```
+
+## 메모
+
+- 환경 변수는 GitHub Secrets로 관리
+- preview 배포와 production 배포 job 분리 검토
+
+> 임시 글입니다. 레이아웃 확인용 초안이에요.

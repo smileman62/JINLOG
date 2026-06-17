@@ -5,5 +5,5 @@ export function blogListUrl(category: BlogCategoryFilter, page: number): string 
   if (category !== "all") params.set("category", category);
   if (page > 1) params.set("page", String(page));
   const q = params.toString();
-  return q ? `/blog?${q}` : "/blog";
+  return q ? `/blog/posts?${q}` : "/blog/posts";
 }

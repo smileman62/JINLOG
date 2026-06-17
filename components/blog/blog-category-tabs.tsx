@@ -17,7 +17,8 @@ export function BlogCategoryTabs({ active }: BlogCategoryTabsProps) {
     <div className="flex flex-wrap gap-2" role="tablist" aria-label="블로그 카테고리">
       {tabs.map(({ key, query }) => {
         const isActive = active === key;
-        const href = query === "all" ? "/blog" : `/blog?category=${query}`;
+        const href =
+          query === "all" ? "/blog/posts" : `/blog/posts?category=${query}`;
         return (
           <Link
             key={key}
