@@ -1,11 +1,12 @@
 import type { NextConfig } from "next";
+import { build } from "velite";
 
-const isDev = process.argv.includes("dev");
 const isBuild = process.argv.includes("build");
 
-if (!process.env.VELITE_STARTED && (isDev || isBuild)) {
+async function ensureVelite() {
+  if (!isBuild || process.env.VELITE_STARTED) return;
   process.env.VELITE_STARTED = "1";
-  import("velite").then((m) => m.build({ watch: isDev, clean: !isDev }));
+  await build({ watch: false, clean: true });
 }
 
 const nextConfig: NextConfig = {
@@ -16,8 +17,26 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "img1.daumcdn.net",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "blog.kakaocdn.net",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "t1.daumcdn.net",
+        pathname: "/**",
+      },
     ],
   },
 };
 
-export default nextConfig;
+export default async function config(): Promise<NextConfig> {
+  await ensureVelite();
+  return nextConfig;
+}

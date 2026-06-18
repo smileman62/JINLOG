@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
+import { ThemeProvider } from "@wrksz/themes/next";
 import { Gaegu, Geist_Mono, Noto_Serif_KR, Space_Mono } from "next/font/google";
-import { ThemeProvider } from "@/components/theme-provider";
 import { getSiteUrl, siteDescription, siteName } from "@/lib/site";
 import "./globals.css";
 
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -82,7 +82,14 @@ export default function RootLayout({
       className={`${geistMono.variable} ${gaegu.variable} ${spaceMono.variable} ${notoSerifKr.variable}`}
     >
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

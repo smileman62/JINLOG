@@ -4,15 +4,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BlogPostHeader } from "@/components/blog/blog-post-header";
 import { MDXContent } from "@/components/blog/mdx-content";
-import { allPosts } from "@/lib/blog/data";
+import { getAllPosts } from "@/lib/blog/data";
+import { normalizeRouteSlug, toRouteSlug, toVeliteSlug } from "@/lib/blog/slug";
 
 type BlogDetailPageProps = {
-  params: Promise<{ slug: string[] }>;
+  params: Promise<{ slug: string | string[] }>;
 };
 
-function getPostBySlug(slugParts: string[]) {
-  const joinedSlug = slugParts.join("/");
-  return allPosts.find((post) => post.slug === joinedSlug);
+function getPostBySlug(slug: string | string[]) {
+  const veliteSlug = toVeliteSlug(normalizeRouteSlug(slug));
+  return getAllPosts().find((post) => post.slug === veliteSlug);
 }
 
 export async function generateMetadata(
@@ -32,8 +33,8 @@ export async function generateMetadata(
 }
 
 export function generateStaticParams() {
-  return allPosts.map((post) => ({
-    slug: post.slug.split("/"),
+  return getAllPosts().map((post) => ({
+    slug: toRouteSlug(post.slug),
   }));
 }
 

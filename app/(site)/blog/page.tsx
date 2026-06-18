@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import { BlogFeaturedPost } from "@/components/blog/blog-featured-post";
 import { BlogRecentPosts } from "@/components/blog/blog-recent-posts";
 import { JsonLd } from "@/components/seo/json-ld";
-import { allPosts } from "@/lib/blog/data";
+import { getAllPosts } from "@/lib/blog/data";
 import { blogPageJsonLd } from "@/lib/seo";
 import { siteName } from "@/lib/site";
 
-export const RECENT_POSTS_COUNT = 3;
+const RECENT_POSTS_COUNT = 3;
 
 export const metadata: Metadata = {
   title: "블로그",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 };
 
 export default function BlogLandingPage() {
-  const [featured, ...rest] = allPosts;
+  const [featured, ...rest] = getAllPosts();
   const recentPosts = rest.slice(0, RECENT_POSTS_COUNT);
 
   return (

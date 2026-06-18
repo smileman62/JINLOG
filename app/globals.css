@@ -44,7 +44,7 @@
   display: none;
 }
 
-/* MDX code blocks — Shiki dual theme (next-themes .dark class) */
+/* MDX code blocks — Shiki dual theme (.dark class) */
 [data-rehype-pretty-code-figure] {
   margin-bottom: 1.25rem;
 }

@@ -29,7 +29,7 @@ export default defineConfig({
   root: "content",
   output: {
     data: ".velite",
-    clean: true,
+    clean: false,
   },
   mdx: {
     rehypePlugins: [

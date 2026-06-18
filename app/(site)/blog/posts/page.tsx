@@ -5,14 +5,16 @@ import { BlogPagination } from "@/components/blog/blog-pagination";
 import { BlogPostList } from "@/components/blog/blog-post-list";
 import { JsonLd } from "@/components/seo/json-ld";
 import {
-  allPosts,
   categoryHeroImage,
   categoryLabels,
+  POSTS_PER_PAGE,
+} from "@/lib/blog/constants";
+import {
   filterPostsByCategory,
+  getAllPosts,
   paginatePosts,
   parseCategoryFilter,
   parsePage,
-  POSTS_PER_PAGE,
 } from "@/lib/blog/data";
 import { blogPostsPageJsonLd } from "@/lib/seo";
 import { siteName } from "@/lib/site";
@@ -56,7 +58,7 @@ export default async function BlogPostsPage(
   const category = parseCategoryFilter(firstString(searchParams.category));
   const requestedPage = parsePage(firstString(searchParams.page));
 
-  const filtered = filterPostsByCategory(allPosts, category);
+  const filtered = filterPostsByCategory(getAllPosts(), category);
   const { items, totalPages, page } = paginatePosts(
     filtered,
     requestedPage,

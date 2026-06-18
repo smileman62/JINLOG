@@ -1,6 +1,6 @@
 import type { BlogPost } from "@/lib/blog/types";
 import Link from "next/link";
-import { categoryLabels } from "@/lib/blog/data";
+import { categoryLabels } from "@/lib/blog/constants";
 
 type BlogPostListProps = {
   posts: BlogPost[];

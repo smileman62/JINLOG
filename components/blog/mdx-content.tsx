@@ -1,3 +1,5 @@
+"use client";
+
 import type { ComponentPropsWithoutRef } from "react";
 import * as runtime from "react/jsx-runtime";
 import Link from "next/link";

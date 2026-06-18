@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { BlogCategoryFilter } from "@/lib/blog/types";
-import { categoryLabels } from "@/lib/blog/data";
+import { categoryLabels } from "@/lib/blog/constants";
 
 const tabs: { key: BlogCategoryFilter; query: string }[] = [
   { key: "all", query: "all" },

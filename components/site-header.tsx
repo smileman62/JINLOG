@@ -2,13 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTheme } from "next-themes";
+import { useTheme } from "@wrksz/themes/client";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const nav = [
-  { href: "/blog", label: "블로그" },
-  { href: "/projects", label: "프로젝트" },
+  { href: "/about", label: "About" },
+  { href: "/blog", label: "Blog" },
+  { href: "/projects", label: "Projects" },
 ] as const;
+
+function isNavActive(pathname: string, href: string) {
+  if (href === "/blog") {
+    return pathname === "/blog" || pathname.startsWith("/blog/");
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
@@ -161,10 +169,7 @@ export function SiteHeader() {
             aria-label="주요 메뉴"
           >
             {nav.map(({ href, label }) => {
-              const active =
-                href === "/blog"
-                  ? pathname === "/blog" || pathname.startsWith("/blog/")
-                  : pathname === href || pathname.startsWith(`${href}/`);
+              const active = isNavActive(pathname, href);
               return (
                 <Link
                   key={href}

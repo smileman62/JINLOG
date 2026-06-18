@@ -1,5 +1,5 @@
 import type { BlogPost } from "@/lib/blog/types";
-import { categoryLabels } from "@/lib/blog/data";
+import { categoryLabels } from "@/lib/blog/constants";
 
 type BlogPostHeaderProps = {
   post: BlogPost;

@@ -1,0 +1,759 @@
+---
+title: "Next.js 스타일링 전략: Tailwind CSS, shadcn/ui, 그리고 CSS-in-JS"
+description: "Next.js 스타일링 전략: Tailwind CSS, shadcn/ui, 그리고 CSS-in-JS 이슈 직접 실험해보기Next.js App Router 환경에서는 스타일링 도구를 선택할 때 단순히 “디자인을 어떻게 입힐 것인가”만 보면 부족합니다. Server Components, …"
+date: "2026-05-17"
+tags: ["nextjs", "react"]
+published: true
+---
+## Next.js 스타일링 전략: Tailwind CSS, shadcn/ui, 그리고 CSS-in-JS 이슈 직접 실험해보기
+
+Next.js App Router 환경에서는 스타일링 도구를 선택할 때 단순히 “디자인을 어떻게 입힐 것인가”만 보면 부족합니다. Server Components, Client Components, SSR, Streaming, 하이드레이션, 번들 크기, 스타일 삽입 시점까지 함께 고려해야 합니다. 특히 App Router에서는 기본적으로 Server Components를 적극적으로 활용할 수 있기 때문에, 스타일링 방식이 서버 렌더링 흐름과 잘 맞는지 확인하는 것이 중요합니다.
+
+이번 글에서는 Tailwind CSS와 shadcn/ui를 활용해 UI 컴포넌트를 구현해보고, Styled-Components를 사용했을 때 SSR 환경에서 어떤 추가 설정이 필요한지 직접 실험해보겠습니다. 마지막으로 이 내용을 바탕으로 Next.js 프로젝트에서 어떤 스타일링 전략을 선택하면 좋을지 정리하겠습니다.
+
+* * *
+
+## Next.js에서 Tailwind CSS가 자주 선택되는 이유
+
+Tailwind CSS는 유틸리티 클래스를 조합해서 UI를 만드는 방식의 CSS 프레임워크입니다. 예를 들어 flex, px-4, text-sm, rounded-xl, bg-white 같은 클래스를 JSX의 className에 직접 작성해서 스타일을 적용합니다. 이 방식은 처음에는 HTML 안에 클래스가 많아 보여 어색할 수 있지만, 컴포넌트 단위로 UI를 작성하는 React와는 꽤 잘 맞는 편입니다.
+
+Next.js App Router에서는 컴포넌트가 기본적으로 Server Component로 동작합니다. Tailwind CSS는 런타임에 JavaScript로 스타일을 생성해서 주입하는 방식이 아니라, 빌드 과정에서 CSS를 생성하고 HTML에는 클래스 이름을 붙이는 방식에 가깝습니다. 그래서 Server Component에서도 특별한 클라이언트 런타임 없이 사용할 수 있습니다.
+
+예를 들어 아래와 같은 컴포넌트는 별도의 "use client" 없이도 서버 컴포넌트로 작성할 수 있습니다.
+
+```
+// app/page.tsx
+
+export default function HomePage() {
+  return (
+    
+      
+        Next.js Styling
+
+        
+          Tailwind CSS로 빠르게 UI를 구성하기
+        
+
+        
+          Tailwind CSS는 유틸리티 클래스를 조합해 컴포넌트 단위의 UI를
+          구성하기 좋은 방식입니다. Server Component에서도 className만
+          사용하면 되기 때문에 Next.js App Router와 함께 사용하기 편합니다.
+        
+
+        
+          시작하기
+        
+      
+    
+  );
+}
+```
+
+이 코드는 서버 컴포넌트로 렌더링될 수 있습니다. 버튼에 hover 스타일이 들어가 있지만, 이것만으로는 클라이언트 상태나 이벤트 핸들러가 필요하지 않습니다. 따라서 "use client"를 붙일 이유가 없습니다. 이 점은 Next.js에서 중요한 차이를 만듭니다. 스타일링을 위해 불필요하게 Client Component로 전환하지 않아도 되기 때문입니다.
+
+Next.js 공식 문서에서도 App Router에서 CSS-in-JS를 구성하려면 스타일 레지스트리, useServerInsertedHTML, Client Component wrapper 같은 별도 구성이 필요하다고 설명합니다. 반면 Tailwind CSS나 CSS Modules는 이러한 런타임 스타일 삽입 흐름을 직접 관리하지 않아도 되는 방식입니다.
+
+* * *
+
+## Tailwind CSS만 사용했을 때 생기는 아쉬움
+
+Tailwind CSS는 빠르게 UI를 만들기 좋지만, 프로젝트가 커지면 클래스 조합이 반복될 수 있습니다. 예를 들어 버튼을 여러 곳에서 사용한다고 가정해보겠습니다.
+
+```
+
+  저장하기
+
+  수정하기
+
+  삭제하기
+
+```
+
+이렇게 같은 스타일이 반복되면 유지보수가 어려워집니다. 나중에 버튼의 radius나 색상, padding을 바꾸려면 여러 파일을 찾아 수정해야 합니다. 그래서 실제 프로젝트에서는 Tailwind CSS를 그대로 쓰기보다는 공통 컴포넌트로 추상화해서 사용하는 경우가 많습니다.
+
+예를 들어 직접 Button 컴포넌트를 만들 수 있습니다.
+
+```
+// components/ui/button.tsx
+
+import { ButtonHTMLAttributes } from "react";
+
+type ButtonVariant = "primary" | "secondary" | "danger";
+
+interface ButtonProps extends ButtonHTMLAttributes {
+  variant?: ButtonVariant;
+}
+
+const variantClassName: Record = {
+  primary: "bg-slate-900 text-white hover:bg-slate-700",
+  secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200",
+  danger: "bg-red-600 text-white hover:bg-red-500",
+};
+
+export function Button({
+  variant = "primary",
+  className = "",
+  children,
+  ...props
+}: ButtonProps) {
+  return (
+    
+      {children}
+    
+  );
+}
+```
+
+그리고 페이지에서는 다음처럼 사용할 수 있습니다.
+
+```
+// app/page.tsx
+
+import { Button } from "@/components/ui/button";
+
+export default function HomePage() {
+  return (
+    
+      
+        저장하기
+        취소하기
+        삭제하기
+      
+    
+  );
+}
+```
+
+이렇게 하면 Tailwind의 장점은 유지하면서도, 반복되는 클래스는 컴포넌트 내부로 숨길 수 있습니다. 다만 직접 모든 컴포넌트를 만들기 시작하면 Button, Input, Modal, Dialog, Dropdown, Select 같은 UI를 계속 구현해야 합니다. 이 지점에서 shadcn/ui가 좋은 선택지가 될 수 있습니다.
+
+* * *
+
+## shadcn/ui는 어떤 방식인가
+
+shadcn/ui는 일반적인 UI 라이브러리와 조금 다릅니다. MUI나 Chakra UI처럼 패키지 내부에 있는 컴포넌트를 import해서 사용하는 방식이라기보다는, 필요한 컴포넌트의 코드를 내 프로젝트 안으로 가져와서 수정하며 사용하는 방식에 가깝습니다. shadcn/ui 공식 문서도 Next.js 프로젝트에서 CLI를 통해 설정하고 컴포넌트를 추가하는 방식을 안내하고 있습니다.
+
+이 방식의 장점은 코드 소유권이 프로젝트에 있다는 점입니다. 예를 들어 Button 컴포넌트를 추가하면 components/ui/button.tsx 같은 파일이 실제 프로젝트 안에 생성됩니다. 이후에는 이 파일을 직접 수정해서 우리 서비스의 디자인 시스템에 맞게 바꿀 수 있습니다.
+
+shadcn/ui는 보통 Tailwind CSS와 Radix UI를 함께 사용합니다. Tailwind CSS는 스타일을 담당하고, Radix UI는 Dialog, Dropdown, Select처럼 접근성 처리가 중요한 UI primitive를 제공합니다. shadcn/ui는 이 둘을 조합한 컴포넌트 예시를 프로젝트에 복사해주는 방식으로 볼 수 있습니다.
+
+* * *
+
+## shadcn/ui 설치 예시
+
+Next.js 프로젝트가 이미 있다고 가정하면, 먼저 shadcn/ui 초기 설정을 진행합니다.
+
+```
+npx shadcn@latest init
+```
+
+초기 설정 후 필요한 컴포넌트를 추가합니다.
+
+```
+npx shadcn@latest add button card input textarea
+```
+
+컴포넌트가 추가되면 보통 다음과 같은 구조가 생깁니다.
+
+```
+components/
+  ui/
+    button.tsx
+    card.tsx
+    input.tsx
+    textarea.tsx
+
+lib/
+  utils.ts
+```
+
+lib/utils.ts에는 보통 cn 함수가 들어갑니다. 이 함수는 조건부 클래스 조합을 정리할 때 사용됩니다.
+
+```
+// lib/utils.ts
+
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+```
+
+clsx는 조건부 className을 조합하는 도구이고, tailwind-merge는 Tailwind 클래스가 충돌할 때 뒤에 온 값을 기준으로 정리해주는 도구입니다. 예를 들어 p-2 p-4가 동시에 들어왔을 때 최종적으로 p-4가 적용되도록 병합할 수 있습니다.
+
+* * *
+
+## Tailwind + shadcn/ui로 UI 컴포넌트 구현하기
+
+이제 shadcn/ui의 Button, Card, Input, Textarea를 활용해서 간단한 게시글 작성 카드를 만들어보겠습니다.
+
+```
+// app/posts/new/page.tsx
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+
+export default function NewPostPage() {
+  return (
+    
+      
+        
+          
+            새 글 작성
+            
+              Next.js 스타일링 전략에 대한 글을 작성해보세요.
+            
+          
+
+          
+            
+          
+        
+      
+    
+  );
+}
+```
+
+이 예제에서 중요한 점은 UI를 구성하는 대부분의 코드가 Server Component로 작성될 수 있다는 것입니다. 현재 코드에는 useState, useEffect, onClick 같은 클라이언트 전용 로직이 없습니다. 따라서 페이지 전체에 "use client"를 붙일 필요가 없습니다.
+
+물론 입력값을 실시간으로 상태 관리하거나, 모달을 열고 닫거나, 클라이언트에서 즉시 유효성 검사를 해야 한다면 해당 부분은 Client Component로 분리할 수 있습니다. 핵심은 “상호작용이 필요한 부분만 Client Component로 분리하고, 나머지 정적 UI는 Server Component로 유지할 수 있다”는 점입니다.
+
+* * *
+
+## variant가 많은 컴포넌트는 cva로 정리하기
+
+shadcn/ui의 Button 컴포넌트를 보면 class-variance-authority, 줄여서 cva를 사용하는 경우가 많습니다. cva는 variant와 size에 따라 className을 체계적으로 관리할 수 있게 도와줍니다.
+
+아래는 단순화한 Button 예시입니다.
+
+```
+// components/ui/custom-button.tsx
+
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+
+import { cn } from "@/lib/utils";
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center rounded-xl text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default: "bg-slate-900 text-white hover:bg-slate-700",
+        outline: "border border-slate-200 bg-white hover:bg-slate-100",
+        ghost: "hover:bg-slate-100",
+        danger: "bg-red-600 text-white hover:bg-red-500",
+      },
+      size: {
+        sm: "h-9 px-3",
+        md: "h-10 px-4",
+        lg: "h-12 px-6",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "md",
+    },
+  }
+);
+
+interface CustomButtonProps
+  extends React.ButtonHTMLAttributes,
+    VariantProps {}
+
+export function CustomButton({
+  className,
+  variant,
+  size,
+  ...props
+}: CustomButtonProps) {
+  return (
+    
+  );
+}
+```
+
+이렇게 하면 버튼 스타일을 문자열로 매번 직접 조합하지 않고, variant와 size라는 명확한 API로 사용할 수 있습니다.
+
+```
+기본 버튼
+외곽선 버튼
+
+  삭제하기
+
+```
+
+이 방식은 디자인 시스템을 만들 때 특히 유용합니다. 버튼, 뱃지, 카드, 인풋처럼 반복적으로 사용되는 컴포넌트는 variant를 명확히 정의해두면 UI의 일관성을 유지하기 쉽습니다.
+
+* * *
+
+## next/image와 next/font도 함께 고려해야 하는 이유
+
+스타일링 전략을 이야기할 때 CSS만 보는 경우가 많지만, 실제 화면 품질에는 이미지와 폰트도 큰 영향을 줍니다. Next.js에서는 next/image와 next/font를 통해 이미지와 폰트를 최적화할 수 있습니다.
+
+next/image의  컴포넌트는 HTML의 를 확장한 컴포넌트이며, 디바이스에 맞는 크기의 이미지 제공, WebP 같은 최신 포맷 사용, lazy loading, layout shift 방지 등의 기능을 제공합니다.
+
+예시는 다음과 같습니다.
+
+```
+// app/profile/page.tsx
+
+import Image from "next/image";
+
+export default function ProfilePage() {
+  return (
+    
+      
+        
+
+        
+          김진성
+          
+            Next.js와 React 기반의 프론트엔드 개발을 학습하고 있습니다.
+          
+        
+      
+    
+  );
+}
+```
+
+폰트는 next/font를 사용할 수 있습니다. Next.js 공식 문서에 따르면 next/font는 폰트를 자동으로 최적화하고 외부 네트워크 요청을 제거하며, 자체 호스팅을 통해 layout shift 없이 웹 폰트를 로드할 수 있도록 돕습니다.
+
+```
+// app/layout.tsx
+
+import type { Metadata } from "next";
+import { Noto_Sans_KR } from "next/font/google";
+import "./globals.css";
+
+const notoSansKr = Noto_Sans_KR({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  variable: "--font-noto-sans-kr",
+});
+
+export const metadata: Metadata = {
+  title: "Next.js Styling Strategy",
+  description: "Next.js 스타일링 전략 정리",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    
+      {children}
+    
+  );
+}
+```
+
+Tailwind 설정에서 CSS 변수를 font family로 연결하면 프로젝트 전체에서 사용할 수 있습니다.
+
+```
+/* app/globals.css */
+
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-noto-sans-kr), sans-serif;
+}
+```
+
+이렇게 하면 UI 컴포넌트 스타일링뿐 아니라 이미지, 폰트까지 Next.js 방식에 맞게 정리할 수 있습니다.
+
+* * *
+
+## CSS-in-JS가 왜 문제가 될 수 있는지 직접 실험해보기
+
+CSS-in-JS는 JavaScript 코드 안에서 CSS를 작성하는 방식입니다. 대표적으로 Styled-Components와 Emotion이 있습니다. 이 방식은 컴포넌트의 props에 따라 스타일을 바꾸기 쉽고, 스타일을 컴포넌트와 함께 관리할 수 있다는 장점이 있습니다.
+
+예를 들어 Styled-Components를 사용하면 다음처럼 작성할 수 있습니다.
+
+```
+"use client";
+
+import styled from "styled-components";
+
+const Button = styled.button`
+  border: none;
+  border-radius: 12px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  background-color: ${({ $variant }) =>
+    $variant === "danger" ? "#dc2626" : "#0f172a"};
+
+  &:hover {
+    background-color: ${({ $variant }) =>
+      $variant === "danger" ? "#ef4444" : "#334155"};
+  }
+`;
+
+export function StyledButton() {
+  return Styled Button;
+}
+```
+
+코드만 보면 깔끔합니다. props에 따라 스타일을 분기하기도 쉽습니다. 하지만 Next.js App Router 환경에서는 이 방식이 Tailwind CSS나 CSS Modules보다 고려할 점이 많습니다.
+
+가장 먼저 Styled-Components를 사용하는 컴포넌트는 보통 Client Component로 작성해야 합니다. 위 코드에서도 "use client"가 필요합니다. 스타일 생성과 삽입이 클라이언트 환경과 관련되기 때문입니다. 이 자체가 문제는 아니지만, 단순한 UI 컴포넌트까지 클라이언트 컴포넌트가 되면 클라이언트 번들에 포함되는 코드가 늘어날 수 있습니다.
+
+또한 SSR 환경에서 서버가 렌더링한 HTML에 스타일이 적절한 순서로 포함되지 않으면, 화면이 처음 나타나는 순간 스타일이 적용되지 않은 상태로 보이거나 하이드레이션 이후 스타일이 적용되는 현상이 생길 수 있습니다. 이를 흔히 FOUC, 즉 Flash of Unstyled Content라고 부릅니다.
+
+Next.js 공식 문서에서는 App Router에서 CSS-in-JS를 사용하려면 렌더링 중 CSS 규칙을 수집하는 style registry, useServerInsertedHTML을 통한 스타일 삽입, 앱을 감싸는 Client Component 구성이 필요하다고 설명합니다.
+
+* * *
+
+## 실험 준비: Styled-Components 설치하기
+
+먼저 Next.js 프로젝트에 Styled-Components를 설치합니다.
+
+```
+npm install styled-components
+npm install -D @types/styled-components
+```
+
+그리고 next.config.ts 또는 next.config.js에 Styled-Components compiler 옵션을 추가합니다.
+
+```
+// next.config.ts
+
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  compiler: {
+    styledComponents: true,
+  },
+};
+
+export default nextConfig;
+```
+
+이 설정은 Styled-Components를 Next.js compiler가 처리할 수 있도록 도와줍니다. 하지만 App Router에서 SSR 스타일 삽입까지 제대로 처리하려면 이것만으로 충분하지 않을 수 있습니다. 그래서 style registry 설정이 필요합니다.
+
+* * *
+
+## 실험 1: Registry 없이 Styled-Components 사용하기
+
+먼저 일부러 registry 설정 없이 Styled-Components를 사용해보겠습니다.
+
+```
+// components/styled/hero-card.tsx
+
+"use client";
+
+import styled from "styled-components";
+
+const Card = styled.section`
+  max-width: 720px;
+  margin: 80px auto;
+  padding: 40px;
+  border-radius: 24px;
+  background: #0f172a;
+  color: white;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+`;
+
+const Label = styled.p`
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #93c5fd;
+`;
+
+const Title = styled.h1`
+  margin: 0;
+  font-size: 40px;
+  line-height: 1.2;
+`;
+
+const Description = styled.p`
+  margin: 20px 0 0;
+  color: #cbd5e1;
+  line-height: 1.8;
+`;
+
+export function HeroCard() {
+  return (
+    
+      CSS-in-JS Experiment
+      Styled-Components SSR 이슈 재현하기
+      
+        이 컴포넌트는 Styled-Components로 작성되었습니다. App Router에서
+        SSR 스타일 삽입 설정이 없을 때 초기 스타일 적용 시점을 확인할 수
+        있습니다.
+      
+    
+  );
+}
+```
+
+이제 페이지에서 사용합니다.
+
+```
+// app/styled-test/page.tsx
+
+import { HeroCard } from "@/components/styled/hero-card";
+
+export default function StyledTestPage() {
+  return (
+    
+      
+    
+  );
+}
+```
+
+이 상태에서 개발 서버를 실행합니다.
+
+```
+npm run dev
+```
+
+그다음 브라우저에서 /styled-test 페이지를 확인합니다.
+
+```
+
+```
+
+개발 환경에서는 문제가 잘 보이지 않을 수 있습니다. 개발 서버는 HMR, 빠른 재컴파일, 개발용 런타임이 섞여 있기 때문입니다. SSR 스타일 문제는 프로덕션 빌드에서 더 확인하기 쉽습니다.
+
+```
+npm run build
+npm run start
+```
+
+이후 브라우저에서 페이지를 새로고침하면서 다음 항목을 확인합니다.
+
+```
+확인할 항목
+
+- 페이지 첫 로딩 순간 스타일이 바로 적용되는가?
+- 아주 짧은 순간 기본 HTML 스타일이 보였다가 styled-components 스타일이 적용되는가?
+- 개발 환경과 프로덕션 환경의 차이가 있는가?
+- View Source에서 styled-components 스타일 태그가 초기 HTML에 포함되어 있는가?
+```
+
+이 실험에서 무조건 FOUC가 눈에 띄게 발생한다고 단정하기는 어렵습니다. 환경, Next.js 버전, Styled-Components 버전, 브라우저 상태, 네트워크 속도에 따라 다르게 보일 수 있습니다. 중요한 것은 Styled-Components를 App Router에서 안정적으로 사용하려면 서버 렌더링 중 생성된 스타일을 적절한 시점에 HTML에 삽입하는 구성이 필요하다는 점입니다.
+
+* * *
+
+## 실험 2: Styled-Components Registry 추가하기
+
+이번에는 Next.js 공식 문서에서 안내하는 흐름에 맞춰 Styled-Components registry를 구성해보겠습니다. App Router에서 CSS-in-JS를 사용하려면 서버 렌더링 중 생성된 스타일을 수집하고, useServerInsertedHTML을 사용해 HTML에 삽입하는 과정이 필요합니다.
+
+먼저 registry 파일을 만듭니다.
+
+```
+// lib/styled-components-registry.tsx
+
+"use client";
+
+import React, { useState } from "react";
+import { useServerInsertedHTML } from "next/navigation";
+import {
+  ServerStyleSheet,
+  StyleSheetManager,
+} from "styled-components";
+
+export function StyledComponentsRegistry({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [styledComponentsStyleSheet] = useState(() => new ServerStyleSheet());
+
+  useServerInsertedHTML(() => {
+    const styles = styledComponentsStyleSheet.getStyleElement();
+
+    styledComponentsStyleSheet.instance.clearTag();
+
+    return <>{styles};
+  });
+
+  if (typeof window !== "undefined") {
+    return <>{children};
+  }
+
+  return (
+    
+      {children}
+    
+  );
+}
+```
+
+그리고 app/layout.tsx에서 전체 앱을 감쌉니다.
+
+```
+// app/layout.tsx
+
+import type { Metadata } from "next";
+import { StyledComponentsRegistry } from "@/lib/styled-components-registry";
+import "./globals.css";
+
+export const metadata: Metadata = {
+  title: "Styled Components SSR Test",
+  description: "Next.js App Router Styled-Components SSR 실험",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    
+      
+        
+          {children}
+        
+      
+    
+  );
+}
+```
+
+이제 다시 프로덕션 빌드를 실행합니다.
+
+```
+npm run build
+npm run start
+```
+
+그리고 /styled-test 페이지를 다시 확인합니다.
+
+```
+확인할 항목
+
+- 초기 HTML에 styled-components 스타일이 포함되는가?
+- 새로고침 시 스타일이 더 안정적으로 적용되는가?
+- 스타일이 늦게 적용되는 현상이 줄어드는가?
+```
+
+이 실험을 통해 알 수 있는 점은 CSS-in-JS 자체가 항상 문제가 된다는 것이 아닙니다. 다만 Next.js App Router와 SSR 환경에서 사용하려면 Tailwind CSS나 CSS Modules보다 설정해야 할 부분이 많고, 스타일 삽입 시점을 신경 써야 한다는 점입니다.
+
+* * *
+
+## 실험 3: 같은 UI를 Tailwind CSS로 작성해보기
+
+이번에는 같은 Hero UI를 Tailwind CSS로 작성해보겠습니다.
+
+```
+// app/tailwind-test/page.tsx
+
+export default function TailwindTestPage() {
+  return (
+    
+      
+        
+          Tailwind CSS Experiment
+        
+
+        
+          Tailwind CSS로 같은 UI 구현하기
+        
+
+        
+          이 컴포넌트는 Tailwind CSS로 작성되었습니다. className 기반으로
+          스타일을 적용하기 때문에 별도의 Client Component 전환이나
+          CSS-in-JS registry 설정이 필요하지 않습니다.
+        
+      
+    
+  );
+}
+```
+
+이 페이지는 기본적으로 Server Component입니다. "use client"도 없고, 스타일을 수집하기 위한 registry도 없습니다. HTML에는 className이 들어가고, CSS는 빌드된 스타일시트에서 처리됩니다.
+
+즉, 같은 UI를 만들 수 있다면 Tailwind CSS 방식이 Next.js App Router의 서버 중심 구조와 더 단순하게 맞아떨어지는 경우가 많습니다.
+
+* * *
+
+## 실험 결과 정리
+
+Styled-Components 방식은 컴포넌트 안에서 스타일을 함께 관리할 수 있고, props 기반 동적 스타일링이 자연스럽습니다. 하지만 Next.js App Router에서 SSR까지 고려하면 style registry, useServerInsertedHTML, Client Component wrapper 설정이 필요합니다. 또한 Styled-Components를 사용하는 컴포넌트는 클라이언트 컴포넌트가 되는 경우가 많기 때문에, 단순한 스타일링을 위해 클라이언트 번들 범위가 넓어지지 않는지 확인해야 합니다.
+
+Tailwind CSS 방식은 클래스가 길어질 수 있다는 단점이 있지만, Server Component에서 바로 사용할 수 있고 별도의 런타임 스타일 삽입 설정이 필요하지 않습니다. 또한 shadcn/ui와 함께 사용하면 Button, Card, Dialog, Input 같은 UI 컴포넌트를 빠르게 구성하면서도 코드를 직접 수정할 수 있습니다.
+
+CSS Modules는 Tailwind CSS와 CSS-in-JS 사이에 있는 안정적인 선택지로 볼 수 있습니다. CSS 파일을 따로 작성하면서도 클래스 이름 충돌을 막을 수 있고, Server Component와 함께 사용하기도 무난합니다. 다만 variant가 많은 디자인 시스템을 구성할 때는 Tailwind + cva 방식보다 반복이 늘어날 수 있습니다.
+
+* * *
+
+## CSS-in-JS가 무조건 나쁜 선택은 아니다
+
+여기서 중요한 점은 CSS-in-JS를 “사용하면 안 되는 기술”로 보면 안 된다는 것입니다. Styled-Components와 Emotion은 여전히 장점이 있습니다. 컴포넌트와 스타일을 한 파일에서 관리하기 좋고, props 기반 스타일 분기가 편하며, 기존 프로젝트에서 이미 디자인 시스템이 CSS-in-JS 기반으로 잘 구축되어 있다면 그대로 유지하는 편이 더 합리적일 수 있습니다.
+
+다만 Next.js App Router로 새 프로젝트를 시작한다면 상황이 조금 다릅니다. 서버 컴포넌트를 적극적으로 활용하고, 초기 렌더링 성능과 번들 크기를 관리하고 싶다면 Tailwind CSS, CSS Modules, shadcn/ui 같은 선택지가 더 단순한 구조를 제공할 수 있습니다.
+
+즉, CSS-in-JS의 문제는 “스타일을 JS로 작성한다”는 사실 하나에만 있는 것이 아닙니다. 실제로는 SSR 스타일 추출, 하이드레이션 타이밍, Client Component 경계, 런타임 비용, 설정 복잡성이 함께 얽혀 있습니다. 이 지점을 이해하고 선택하는 것이 중요합니다.
+
+* * *
+
+## 블로그 예제 프로젝트 구조
+
+이 글에서 다룬 실험을 하나의 프로젝트 안에서 구성하면 다음과 같은 구조가 됩니다.
+
+```
+app/
+  layout.tsx
+  globals.css
+
+  page.tsx
+
+  posts/
+    new/
+      page.tsx
+
+  styled-test/
+    page.tsx
+
+  tailwind-test/
+    page.tsx
+
+components/
+  styled/
+    hero-card.tsx
+
+  ui/
+    button.tsx
+    card.tsx
+    input.tsx
+    textarea.tsx
+    custom-button.tsx
+
+lib/
+  styled-components-registry.tsx
+  utils.ts
+
+next.config.ts
+```
+
+posts/new/page.tsx에서는 Tailwind + shadcn/ui 기반 컴포넌트를 확인하고, styled-test/page.tsx에서는 Styled-Components SSR 설정 여부에 따른 차이를 확인합니다. tailwind-test/page.tsx에서는 같은 UI를 Tailwind CSS만으로 구성해 비교할 수 있습니다.
+
+* * *
+
+## 마치며
+
+Next.js에서 스타일링 전략을 선택할 때는 단순히 문법 취향만 기준으로 삼기보다는, App Router의 렌더링 구조와 함께 생각해야 합니다. Tailwind CSS는 className 기반으로 동작하기 때문에 Server Components와 함께 사용하기 편하고, 런타임 스타일 삽입 설정이 필요하지 않습니다. shadcn/ui는 Tailwind 기반 컴포넌트를 프로젝트 안으로 가져와 직접 수정하는 방식이라, 빠르게 UI를 만들면서도 코드 제어권을 유지할 수 있습니다.
+
+반면 Styled-Components나 Emotion 같은 CSS-in-JS는 동적 스타일링에는 장점이 있지만, Next.js App Router에서는 SSR 스타일 삽입과 Client Component 경계를 고려해야 합니다. 특히 Styled-Components를 사용할 때는 compiler.styledComponents 설정뿐 아니라, style registry와 useServerInsertedHTML을 활용한 구성이 필요할 수 있습니다.
+
+따라서 새 Next.js 프로젝트를 시작한다면 기본 스타일링은 Tailwind CSS 또는 CSS Modules로 가져가고, UI 컴포넌트는 shadcn/ui를 활용하는 방식이 관리하기 쉽습니다. CSS-in-JS는 기존 코드베이스, 강한 동적 스타일 요구사항, 이미 구축된 디자인 시스템이 있을 때 선택할 수 있지만, SSR과 App Router 환경에서 필요한 설정을 함께 이해하고 도입하는 것이 좋습니다.
+
+읽어주셔서 감사합니다!

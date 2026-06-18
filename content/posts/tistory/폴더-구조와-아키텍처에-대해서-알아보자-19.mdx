@@ -1,0 +1,755 @@
+---
+title: "폴더 구조와 아키텍처에 대해서 알아보자!"
+description: "폴더 구조 & 아키텍처프론트엔드 프로젝트가 작을 때는 보통 components, hooks, utils, api, pages 정도로 폴더를 나눠도 큰 문제가 없습니다. 하지만 기능이 많아지고, 로그인, 게시글, 댓글, 마이페이지, 관리자 기능, 실시간 알림, 검색, 필터링 같은 도메인…"
+date: "2026-05-17"
+tags: ["nextjs", "react"]
+published: true
+---
+## 폴더 구조 & 아키텍처
+
+프론트엔드 프로젝트가 작을 때는 보통 components, hooks, utils, api, pages 정도로 폴더를 나눠도 큰 문제가 없습니다. 하지만 기능이 많아지고, 로그인, 게시글, 댓글, 마이페이지, 관리자 기능, 실시간 알림, 검색, 필터링 같은 도메인이 늘어나면 문제가 생기기 시작합니다.
+
+예를 들어 components 폴더 안에 UserCard, PostCard, CommentItem, AdminTable, LoginForm, ProfileEditModal 같은 파일이 계속 쌓이면, 이 컴포넌트가 어느 기능에 속하는지 알기 어려워집니다. hooks 폴더도 마찬가지입니다. useUser, usePost, useAuth, useModal, useDebounce, useInfiniteScroll 같은 훅이 한 곳에 모이면, 어떤 훅이 특정 기능 전용이고 어떤 훅이 공통 유틸인지 구분하기 어려워집니다.
+
+그래서 규모가 있는 프론트엔드 프로젝트에서는 단순히 기술 종류별로 나누는 방식보다, **기능과 도메인을 기준으로 코드를 나누는 구조**가 필요합니다. 이때 자주 사용되는 방식이 **FSD, Feature-Sliced Design**입니다.
+
+FSD는 프론트엔드 애플리케이션을 layers, slices, segments라는 기준으로 나누는 구조입니다. 공식 문서에서도 FSD의 핵심 구조를 레이어, 슬라이스, 세그먼트로 설명하며, 레이어는 책임과 의존성의 크기에 따라 코드를 나누는 기준이고, 슬라이스는 비즈니스 의미 단위로 코드를 묶는 기준이며, 세그먼트는 기술적 역할에 따라 내부 코드를 나누는 기준입니다.
+
+* * *
+
+## FSD 아키텍처란?
+
+FSD는 **Feature-Sliced Design**의 약자로, 프론트엔드 코드를 기능 단위로 분리하기 위한 아키텍처 방법론입니다. 이름 그대로 애플리케이션을 기능 단위로 잘라서 관리하는 방식입니다.
+
+기존 구조에서는 보통 다음과 같이 폴더를 나눕니다.
+
+```
+src/
+├── components/
+├── hooks/
+├── pages/
+├── api/
+├── utils/
+├── stores/
+└── types/
+```
+
+이 구조는 초반에는 단순해서 좋습니다. 하지만 프로젝트가 커질수록 components 폴더가 너무 커지고, 특정 기능에서만 쓰이는 코드와 전역에서 재사용되는 코드가 섞이는 문제가 생깁니다.
+
+반면 FSD는 코드를 다음과 같이 나눕니다.
+
+```
+src/
+├── app/
+├── pages/
+├── widgets/
+├── features/
+├── entities/
+└── shared/
+```
+
+각 폴더는 단순한 분류명이 아니라, **역할과 의존성 방향을 가진 계층**입니다.
+
+\- app은 앱 전체 설정을 담당합니다. 라우터, 전역 Provider, 전역 스타일, QueryClient 설정, Zustand Provider, Theme 설정 등이 들어갑니다.
+
+\- pages는 실제 라우트 단위의 페이지를 담당합니다. Next.js App Router를 사용한다면 app/ 라우팅 폴더와 FSD의 pages 레이어를 어떻게 조합할지 팀 규칙을 정해야 합니다. 일반적으로 Next.js의 app 라우트 파일은 최대한 얇게 유지하고, 실제 페이지 UI는 FSD의 pages 또는 views 성격의 모듈로 분리하는 방식이 많이 사용됩니다.
+
+\- widgets는 여러 기능과 엔티티를 조합해서 만든 큰 UI 블록입니다. 예를 들어 Header, Sidebar, PostList, UserProfileSection, CommentSection 같은 단위가 여기에 들어갈 수 있습니다.
+
+\- features는 사용자의 행동 단위 기능입니다. 예를 들어 login, logout, create-post, edit-profile, add-comment, like-post, search-anime 같은 기능이 들어갑니다.
+
+\- entities는 비즈니스 도메인의 핵심 개체입니다. 예를 들어 user, post, comment, anime, review, favorite 같은 것들이 엔티티가 됩니다.
+
+\- shared는 특정 비즈니스 도메인에 속하지 않는 공통 코드입니다. 예를 들어 공통 Button, Modal, Input, API 클라이언트, 날짜 포맷 함수, 공통 타입, 공통 상수 등이 들어갑니다.
+
+* * *
+
+## Layered Architecture 적용
+
+FSD는 기본적으로 **Layered Architecture**, 즉 계층형 아키텍처의 성격을 가집니다. 계층형 아키텍처의 핵심은 각 계층이 자신의 역할을 명확히 가지고, 의존성 방향을 제한하는 것입니다.
+
+프론트엔드에서 계층형 구조를 적용하지 않으면 이런 문제가 생깁니다.
+
+```
+// 안 좋은 예시
+import {LoginForm }from'@/components/LoginForm';
+import {useUserStore }from'@/stores/userStore';
+import {fetchUser }from'@/api/user';
+import {formatDate }from'@/utils/date';
+```
+
+위 코드 자체가 무조건 나쁜 것은 아닙니다. 하지만 프로젝트 전체가 이런 식으로 구성되면 어느 코드가 어느 기능에 속하는지 알기 어렵습니다. 로그인 기능에서만 쓰는 폼이 components에 있고, 유저 API는 api에 있고, 상태는 stores에 있고, 타입은 types에 흩어지게 됩니다. 결국 하나의 기능을 수정하려면 여러 폴더를 왔다 갔다 해야 합니다.
+
+FSD에서는 같은 기능에 관련된 코드를 가까이 둡니다.
+
+```
+src/
+├── features/
+│   └── login/
+│       ├── ui/
+│       │   └── LoginForm.tsx
+│       ├── model/
+│       │   └── useLoginForm.ts
+│       ├── api/
+│       │   └── loginApi.ts
+│       └── index.ts
+```
+
+이렇게 하면 로그인 기능을 수정할 때 features/login 폴더만 보면 됩니다. UI, 상태 로직, API 요청, 외부로 공개할 모듈이 한 기능 안에 모여 있기 때문에 응집도가 높아집니다.
+
+계층형 구조에서 중요한 것은 의존성 방향입니다. 일반적으로 FSD에서는 상위 계층이 하위 계층을 가져다 쓸 수 있지만, 하위 계층이 상위 계층을 가져다 쓰면 안 됩니다.
+
+```
+app
+ ↓
+pages
+ ↓
+widgets
+ ↓
+features
+ ↓
+entities
+ ↓
+shared
+```
+
+예를 들어 pages는 widgets, features, entities, shared를 사용할 수 있습니다. 하지만 shared가 features를 import하면 안 됩니다. shared는 가장 낮은 계층이기 때문에 어떤 비즈니스 기능에도 의존하지 않아야 합니다.
+
+* * *
+
+## 모듈 간 의존성 관리
+
+FSD에서 가장 중요한 부분은 **모듈 간 의존성 관리**입니다. 폴더를 아무리 잘 나눠도 import 규칙이 무너지면 구조는 금방 망가집니다.
+
+예를 들어 다음과 같은 코드는 문제가 될 수 있습니다.
+
+```
+// 좋지 않은 예시
+import {UserAvatar }from'@/entities/user/ui/UserAvatar';
+import {userApi }from'@/entities/user/api/userApi';
+```
+
+이 코드는 entities/user 내부 구조를 외부에서 직접 알고 접근하고 있습니다. 처음에는 괜찮아 보이지만, 나중에 UserAvatar의 위치를 바꾸거나 userApi를 리팩토링하면 이 파일을 import한 모든 곳이 영향을 받습니다.
+
+FSD에서는 이를 막기 위해 **Public API** 개념을 사용합니다. Public API는 특정 슬라이스가 외부에 공개할 코드만 index.ts에서 export하는 방식입니다. 공식 문서에서도 Public API를 모듈 간 계약으로 설명하며, 외부 코드는 내부 파일 구조가 아니라 Public API를 통해서만 접근하는 것이 권장됩니다.
+
+예를 들어 entities/user가 있다면 다음처럼 구성할 수 있습니다.
+
+```
+src/
+└── entities/
+    └── user/
+        ├── ui/
+        │   └── UserAvatar.tsx
+        ├── model/
+        │   └── types.ts
+        ├── api/
+        │   └── userApi.ts
+        └── index.ts
+```
+
+```
+// entities/user/index.ts
+export {UserAvatar }from'./ui/UserAvatar';
+exporttype {User }from'./model/types';
+```
+
+외부에서는 다음처럼 import합니다.
+
+```
+// 좋은 예시
+import {UserAvatar,typeUser }from'@/entities/user';
+```
+
+이렇게 하면 entities/user 내부 구조가 바뀌어도 외부 코드는 영향을 덜 받습니다. 예를 들어 UserAvatar.tsx를 ui/avatar/UserAvatar.tsx로 옮기더라도 index.ts만 수정하면 됩니다.
+
+반대로 다음과 같은 import는 피하는 것이 좋습니다.
+
+```
+// 피해야 하는 예시
+import {UserAvatar }from'@/entities/user/ui/UserAvatar';
+```
+
+이 방식은 내부 파일 경로에 직접 의존하기 때문에 리팩토링에 약합니다.
+
+* * *
+
+## FSD의 Layers, Slices, Segments
+
+FSD는 크게 세 가지 기준으로 코드를 나눕니다.
+
+첫 번째는 **Layer**입니다. Layer는 코드의 책임 범위를 기준으로 나누는 최상위 계층입니다. 예를 들어 app, pages, widgets, features, entities, shared가 여기에 해당합니다.
+
+두 번째는 **Slice**입니다. Slice는 비즈니스 도메인이나 기능 의미를 기준으로 나누는 단위입니다. 공식 문서에서도 slice는 제품, 비즈니스, 애플리케이션의 의미에 따라 코드를 그룹화하는 단위라고 설명합니다. 예를 들어 user, post, comment, anime, favorite, search 같은 이름이 slice가 될 수 있습니다.
+
+세 번째는 **Segment**입니다. Segment는 slice 내부에서 기술적 목적에 따라 코드를 나누는 단위입니다. 일반적으로 ui, model, api, lib, config 같은 이름을 사용합니다.
+
+예를 들어 애니메이션 선택 서비스를 만든다고 하면 다음처럼 구성할 수 있습니다.
+
+```
+src/
+├── app/
+│   ├── providers/
+│   ├── styles/
+│   └── router/
+│
+├── pages/
+│   ├── home/
+│   ├── anime-select/
+│   └── result/
+│
+├── widgets/
+│   ├── anime-search-panel/
+│   ├── selected-anime-grid/
+│   └── result-share-card/
+│
+├── features/
+│   ├── search-anime/
+│   ├── select-anime/
+│   ├── remove-selected-anime/
+│   ├── reorder-anime/
+│   └── share-result/
+│
+├── entities/
+│   ├── anime/
+│   ├── user/
+│   └── result/
+│
+└── shared/
+    ├── ui/
+    ├── api/
+    ├── lib/
+    ├── constants/
+    └── types/
+```
+
+이 구조를 보면 각 기능의 위치를 예측하기 쉬워집니다.
+
+애니메이션 검색 API는 features/search-anime/api 또는 검색 결과가 애니메이션 도메인에 강하게 속한다면 entities/anime/api에 둘 수 있습니다.
+
+애니메이션 카드 UI는 entities/anime/ui/AnimeCard.tsx에 둘 수 있습니다.
+
+선택된 애니메이션 9개를 보여주는 큰 영역은 여러 개의 AnimeCard와 선택/삭제 기능을 조합하므로 widgets/selected-anime-grid에 둘 수 있습니다.
+
+선택 버튼을 누르는 기능은 사용자 액션이므로 features/select-anime에 둘 수 있습니다.
+
+최종 결과 페이지는 여러 위젯과 기능을 조합하므로 pages/result에 둘 수 있습니다.
+
+* * *
+
+# 실제 예시: 애니메이션 9선 선택 서비스
+
+예를 들어 사용자가 애니메이션을 검색하고, 9개를 선택하고, 순서를 바꾼 뒤, 결과 이미지를 공유하는 서비스를 만든다고 가정해보겠습니다.
+
+처음에는 다음처럼 단순하게 만들 수 있습니다.
+
+```
+src/
+├── components/
+│   ├── AnimeCard.tsx
+│   ├── SearchInput.tsx
+│   ├── SelectedGrid.tsx
+│   └── ShareButton.tsx
+├── hooks/
+│   ├── useAnimeSearch.ts
+│   └── useSelectedAnime.ts
+├── api/
+│   └── animeApi.ts
+├── pages/
+│   ├── HomePage.tsx
+│   └── ResultPage.tsx
+└── stores/
+    └── animeStore.ts
+```
+
+작은 프로젝트라면 이 구조도 충분합니다. 하지만 검색 필터, 정렬, 로그인, 결과 저장, 공유 이미지 생성, 댓글, 좋아요, 마이페이지까지 추가되면 components, hooks, stores가 금방 복잡해집니다.
+
+FSD 방식으로 리팩토링하면 다음처럼 나눌 수 있습니다.
+
+```
+src/
+├── app/
+│   ├── providers/
+│   │   ├── QueryProvider.tsx
+│   │   └── ThemeProvider.tsx
+│   └── styles/
+│       └── globals.css
+│
+├── pages/
+│   ├── home/
+│   │   ├── ui/
+│   │   │   └── HomePage.tsx
+│   │   └── index.ts
+│   ├── anime-select/
+│   │   ├── ui/
+│   │   │   └── AnimeSelectPage.tsx
+│   │   └── index.ts
+│   └── result/
+│       ├── ui/
+│       │   └── ResultPage.tsx
+│       └── index.ts
+│
+├── widgets/
+│   ├── anime-search-panel/
+│   │   ├── ui/
+│   │   │   └── AnimeSearchPanel.tsx
+│   │   └── index.ts
+│   ├── selected-anime-grid/
+│   │   ├── ui/
+│   │   │   └── SelectedAnimeGrid.tsx
+│   │   └── index.ts
+│   └── result-card/
+│       ├── ui/
+│       │   └── ResultCard.tsx
+│       └── index.ts
+│
+├── features/
+│   ├── search-anime/
+│   │   ├── api/
+│   │   │   └── searchAnime.ts
+│   │   ├── model/
+│   │   │   └── useAnimeSearch.ts
+│   │   ├── ui/
+│   │   │   └── SearchAnimeInput.tsx
+│   │   └── index.ts
+│   ├── select-anime/
+│   │   ├── model/
+│   │   │   └── selectedAnimeStore.ts
+│   │   ├── ui/
+│   │   │   └── SelectAnimeButton.tsx
+│   │   └── index.ts
+│   ├── reorder-anime/
+│   │   ├── model/
+│   │   │   └── useReorderAnime.ts
+│   │   └── index.ts
+│   └── share-result/
+│       ├── lib/
+│       │   └── createShareImage.ts
+│       ├── ui/
+│       │   └── ShareResultButton.tsx
+│       └── index.ts
+│
+├── entities/
+│   └── anime/
+│       ├── api/
+│       │   └── animeApi.ts
+│       ├── model/
+│       │   └── types.ts
+│       ├── ui/
+│       │   └── AnimeCard.tsx
+│       └── index.ts
+│
+└── shared/
+    ├── ui/
+    │   ├── Button/
+    │   ├── Input/
+    │   └── Modal/
+    ├── api/
+    │   └── httpClient.ts
+    ├── lib/
+    │   ├── cn.ts
+    │   └── formatDate.ts
+    ├── constants/
+    │   └── routes.ts
+    └── types/
+        └── api.ts
+```
+
+이 구조에서는 각 코드의 위치가 더 명확해집니다.
+
+AnimeCard는 애니메이션이라는 도메인 자체를 표현하는 UI이므로 entities/anime/ui에 둡니다.
+
+SearchAnimeInput은 사용자가 애니메이션을 검색하는 액션과 연결되므로 features/search-anime/ui에 둡니다.
+
+SelectedAnimeGrid는 선택된 애니메이션 목록, 삭제 버튼, 순서 변경 기능 등을 조합하는 큰 UI 블록이므로 widgets/selected-anime-grid에 둡니다.
+
+AnimeSelectPage는 검색 패널과 선택 그리드를 조합하는 페이지 단위이므로 pages/anime-select에 둡니다.
+
+* * *
+
+## 예시 코드
+
+예를 들어 entities/anime는 애니메이션이라는 도메인 자체를 표현합니다.
+
+```
+// entities/anime/model/types.ts
+exportinterfaceAnime {
+  id:number;
+  title:string;
+  posterUrl:string;
+  releaseYear?:number;
+}
+```
+
+```
+// entities/anime/ui/AnimeCard.tsx
+importtype {Anime }from'../model/types';
+
+interfaceAnimeCardProps {
+  anime:Anime;
+  rightSlot?:React.ReactNode;
+}
+
+exportfunctionAnimeCard({ anime, rightSlot }:AnimeCardProps) {
+return (
+
+{anime.title}
+          {anime.releaseYear&& (
+{anime.releaseYear}
+          )}
+
+        {rightSlot}
+
+  );
+}
+```
+
+```
+// entities/anime/index.ts
+export {AnimeCard }from'./ui/AnimeCard';
+exporttype {Anime }from'./model/types';
+```
+
+이제 외부에서는 내부 경로가 아니라 Public API를 통해 가져옵니다.
+
+```
+import {AnimeCard,typeAnime }from'@/entities/anime';
+```
+
+다음은 애니메이션 선택 기능입니다.
+
+```
+// features/select-anime/model/selectedAnimeStore.ts
+import {create }from'zustand';
+importtype {Anime }from'@/entities/anime';
+
+interfaceSelectedAnimeState {
+  selectedAnimeList:Anime[];
+  selectAnime: (anime:Anime) =>void;
+  removeAnime: (animeId:number) =>void;
+}
+
+exportconstuseSelectedAnimeStore=create((set) => ({
+  selectedAnimeList: [],
+
+  selectAnime: (anime) =>
+set((state) => {
+constalreadySelected=state.selectedAnimeList.some(
+        (item) =>item.id===anime.id,
+      );
+
+if (alreadySelected||state.selectedAnimeList.length>=9) {
+returnstate;
+      }
+
+return {
+        selectedAnimeList: [...state.selectedAnimeList,anime],
+      };
+    }),
+
+  removeAnime: (animeId) =>
+set((state) => ({
+      selectedAnimeList:state.selectedAnimeList.filter(
+        (anime) =>anime.id!==animeId,
+      ),
+    })),
+}));
+```
+
+```
+// features/select-anime/ui/SelectAnimeButton.tsx
+importtype {Anime }from'@/entities/anime';
+import {useSelectedAnimeStore }from'../model/selectedAnimeStore';
+
+interfaceSelectAnimeButtonProps {
+  anime:Anime;
+}
+
+exportfunctionSelectAnimeButton({ anime }:SelectAnimeButtonProps) {
+constselectAnime=useSelectedAnimeStore((state) =>state.selectAnime);
+
+return (
+selectAnime(anime)}
+className="rounded-md bg-black px-3 py-2 text-sm text-white"
+>
+      선택
+
+  );
+}
+```
+
+```
+// features/select-anime/index.ts
+export {SelectAnimeButton }from'./ui/SelectAnimeButton';
+export {useSelectedAnimeStore }from'./model/selectedAnimeStore';
+```
+
+그리고 위젯에서는 엔티티와 기능을 조합합니다.
+
+```
+// widgets/anime-search-panel/ui/AnimeSearchPanel.tsx
+import {AnimeCard }from'@/entities/anime';
+import {SelectAnimeButton }from'@/features/select-anime';
+import {useAnimeSearch }from'@/features/search-anime';
+
+exportfunctionAnimeSearchPanel() {
+const { keyword, setKeyword, animeList, isLoading }=useAnimeSearch();
+
+return (
+
+setKeyword(event.target.value)}
+placeholder="애니메이션 검색"
+className="w-full rounded-lg border px-4 py-3"
+/>
+
+      {isLoading&&검색 중입니다.}
+
+        {animeList.map((anime) => (
+}
+/>
+        ))}
+
+  );
+}
+```
+
+이 구조에서 AnimeSearchPanel은 entities/anime의 AnimeCard와 features/select-anime의 SelectAnimeButton을 조합합니다. 즉, 위젯은 여러 하위 계층을 조합하는 역할을 합니다.
+
+* * *
+
+## 실제 프로젝트 폴더 구조 리팩토링 방식
+
+기존 프로젝트를 FSD로 리팩토링할 때는 한 번에 모든 폴더를 갈아엎으려고 하면 오히려 위험합니다. 가장 좋은 방식은 **기능 하나씩 이동하는 것**입니다.
+
+예를 들어 기존 구조가 다음과 같다고 가정해보겠습니다.
+
+```
+src/
+├── components/
+│   ├── AnimeCard.tsx
+│   ├── SearchInput.tsx
+│   ├── SelectedGrid.tsx
+│   └── ShareButton.tsx
+├── hooks/
+│   ├── useAnimeSearch.ts
+│   └── useSelectedAnime.ts
+├── api/
+│   └── animeApi.ts
+├── stores/
+│   └── selectedAnimeStore.ts
+└── pages/
+    ├── HomePage.tsx
+    └── ResultPage.tsx
+```
+
+이때 먼저 도메인 중심으로 코드를 분류합니다.
+
+AnimeCard, animeApi, Anime 타입은 애니메이션 도메인에 해당하므로 entities/anime로 이동합니다.
+
+selectedAnimeStore, SelectButton, useSelectedAnime는 사용자가 애니메이션을 선택하는 기능이므로 features/select-anime로 이동합니다.
+
+SearchInput, useAnimeSearch는 검색 기능이므로 features/search-anime로 이동합니다.
+
+SelectedGrid는 여러 선택된 애니메이션을 보여주는 UI 블록이므로 widgets/selected-anime-grid로 이동합니다.
+
+ShareButton과 공유 이미지 생성 로직은 결과 공유 기능이므로 features/share-result로 이동합니다.
+
+리팩토링 후에는 다음처럼 정리됩니다.
+
+```
+src/
+├── features/
+│   ├── search-anime/
+│   ├── select-anime/
+│   └── share-result/
+├── entities/
+│   └── anime/
+├── widgets/
+│   └── selected-anime-grid/
+├── pages/
+│   ├── home/
+│   └── result/
+└── shared/
+```
+
+중요한 것은 파일 이동 후 import 경로를 정리하는 것입니다. 특히 외부에서 내부 파일을 직접 import하지 않도록 index.ts를 만들어 Public API를 구성해야 합니다.
+
+```
+// features/search-anime/index.ts
+export {SearchAnimeInput }from'./ui/SearchAnimeInput';
+export {useAnimeSearch }from'./model/useAnimeSearch';
+```
+
+```
+// widgets/selected-anime-grid/index.ts
+export {SelectedAnimeGrid }from'./ui/SelectedAnimeGrid';
+```
+
+```
+// pages/anime-select/ui/AnimeSelectPage.tsx
+import {AnimeSearchPanel }from'@/widgets/anime-search-panel';
+import {SelectedAnimeGrid }from'@/widgets/selected-anime-grid';
+
+exportfunctionAnimeSelectPage() {
+return (
+
+  );
+}
+```
+
+* * *
+
+## Next.js App Router와 함께 사용할 때
+
+Next.js App Router를 사용하면 이미 src/app 폴더가 라우팅 역할을 합니다. 이때 FSD의 app 레이어와 Next.js의 app 라우터가 이름이 겹칠 수 있습니다.
+
+이 경우 보통 두 가지 방식 중 하나를 선택합니다.
+
+첫 번째 방식은 Next.js의 app 폴더를 라우팅 전용으로 두고, 실제 화면 구현은 FSD 구조 안으로 분리하는 방식입니다.
+
+```
+src/
+├── app/
+│   ├── page.tsx
+│   ├── result/
+│   │   └── page.tsx
+│   └── layout.tsx
+├── pages/
+│   ├── home/
+│   └── result/
+├── widgets/
+├── features/
+├── entities/
+└── shared/
+```
+
+```
+// src/app/page.tsx
+import {HomePage }from'@/pages/home';
+
+exportdefaultfunctionPage() {
+return;
+}
+```
+
+```
+// src/app/result/page.tsx
+import {ResultPage }from'@/pages/result';
+
+exportdefaultfunctionPage() {
+return;
+}
+```
+
+이 방식의 장점은 Next.js 라우팅 규칙과 FSD 화면 구조를 분리할 수 있다는 점입니다. src/app은 라우팅 진입점으로만 사용하고,
+
+실제 UI와 비즈니스 로직은 pages, widgets, features, entities로 분리합니다.
+
+두 번째 방식은 FSD의 pages 레이어를 사용하지 않고, Next.js의 app 폴더 안에서 페이지를 관리하는 방식입니다.
+
+```
+src/
+├── app/
+│   ├── page.tsx
+│   ├── result/
+│   │   └── page.tsx
+│   └── layout.tsx
+├── widgets/
+├── features/
+├── entities/
+└── shared/
+```
+
+이 방식은 구조가 더 단순합니다. 다만 페이지 단위 UI가 커질 경우 app 폴더가 복잡해질 수 있으므로, app/page.tsx는 얇게 유지하는 것이 좋습니다.
+
+개인 프로젝트나 중간 규모 프로젝트에서는 첫 번째 방식이 더 관리하기 쉽습니다. 특히 포트폴리오나 팀 프로젝트에서는 app 라우팅 파일이 얇고, 실제 구현이 FSD 구조에 들어가 있으면 아키텍처 설명도 훨씬 명확해집니다.
+
+* * *
+
+## Shared 폴더를 조심해서 사용해야 하는 이유
+
+FSD를 적용할 때 가장 흔한 실수는 shared를 새로운 utils, components 쓰레기통처럼 사용하는 것입니다.
+
+예를 들어 다음처럼 모든 것을 shared에 넣으면 FSD를 적용한 의미가 줄어듭니다.
+
+```
+shared/
+├── components/
+│   ├── AnimeCard.tsx
+│   ├── UserProfile.tsx
+│   ├── CommentItem.tsx
+│   └── PostList.tsx
+├── hooks/
+├── api/
+└── utils/
+```
+
+shared에는 정말로 도메인과 무관한 코드만 들어가야 합니다.
+
+예를 들어 Button, Input, Modal, Dropdown, cn, formatDate, httpClient는 shared에 둘 수 있습니다.
+
+하지만 AnimeCard, UserProfile, PostList, CommentItem은 도메인 의미가 있으므로 shared에 두기보다는 각각 entities/anime, entities/user, entities/post, entities/comment로 보내는 것이 좋습니다.
+
+```
+shared/ui/Button
+shared/ui/Input
+shared/lib/cn
+shared/lib/formatDate
+shared/api/httpClient
+```
+
+```
+entities/anime/ui/AnimeCard
+entities/user/ui/UserProfile
+entities/comment/ui/CommentItem
+```
+
+이 기준을 지키면 공통 코드와 도메인 코드가 섞이지 않습니다.
+
+* * *
+
+## FSD를 적용할 때의 판단 기준
+
+컴포넌트를 어디에 둬야 할지 헷갈릴 때는 다음 기준으로 판단하면 됩니다.
+
+특정 도메인 자체를 표현한다면 entities에 둡니다. 예를 들어 UserAvatar, AnimeCard, PostItem, CommentItem은 엔티티에 가깝습니다.
+
+사용자의 행동을 처리한다면 features에 둡니다. 예를 들어 LoginForm, LikeButton, FollowButton, SearchAnimeInput, ShareResultButton은 기능에 가깝습니다.
+
+여러 엔티티와 기능을 조합한 큰 UI 블록이라면 widgets에 둡니다. 예를 들어 Header, Sidebar, AnimeSearchPanel, SelectedAnimeGrid, CommentSection은 위젯에 가깝습니다.
+
+라우트 단위 화면이라면 pages에 둡니다. 예를 들어 HomePage, AnimeSelectPage, ResultPage, MyPage는 페이지에 가깝습니다.
+
+비즈니스와 무관하게 어디서든 재사용된다면 shared에 둡니다. 예를 들어 Button, Input, Modal, useDebounce, cn, formatDate, httpClient는 shared에 둘 수 있습니다.
+
+* * *
+
+## FSD의 장점
+
+FSD의 가장 큰 장점은 **코드 위치를 예측하기 쉬워진다**는 점입니다. 기능이 많아져도 “검색 기능은 features/search-anime에 있겠구나”, “애니메이션 타입과 카드는 entities/anime에 있겠구나”, “선택된 애니메이션 목록 UI는 widgets/selected-anime-grid에 있겠구나”라고 예상할 수 있습니다.
+
+두 번째 장점은 **기능 단위 리팩토링이 쉬워진다**는 점입니다. 예를 들어 검색 기능을 React Query 기반에서 Server Action 기반으로 바꾸고 싶다면 features/search-anime 중심으로 수정하면 됩니다.
+
+세 번째 장점은 **의존성 방향이 명확해진다**는 점입니다. features가 widgets를 가져다 쓰거나, entities가 features를 가져다 쓰는 식의 역방향 의존성을 막으면 순환 참조와 스파게티 구조를 줄일 수 있습니다.
+
+네 번째 장점은 **팀원 간 작업 충돌이 줄어든다**는 점입니다. 기능별로 폴더가 분리되어 있으므로 검색 기능을 담당하는 사람, 결과 공유 기능을 담당하는 사람, 마이페이지를 담당하는 사람이 서로 다른 영역에서 작업할 수 있습니다.
+
+다섯 번째 장점은 **포트폴리오에서 아키텍처 설명이 쉬워진다**는 점입니다. 단순히 “폴더를 나눴다”가 아니라, “FSD 기반으로 레이어를 분리하고, Public API를 통해 모듈 간 의존성을 제한했으며, 도메인 단위로 응집도를 높였다”고 설명할 수 있습니다.
+
+* * *
+
+## FSD의 단점과 주의할 점
+
+FSD는 무조건 좋은 구조는 아닙니다. 작은 프로젝트에서 처음부터 너무 엄격하게 적용하면 오히려 개발 속도가 느려질 수 있습니다.
+
+예를 들어 페이지가 2~3개뿐이고 기능도 단순한 프로젝트에서 features, entities, widgets, shared를 모두 세세하게 나누면 파일을 만들 때마다 고민이 많아집니다. 이 경우에는 처음에는 단순한 구조로 시작하고, 기능이 복잡해지는 시점에 FSD로 점진적으로 옮기는 것이 좋습니다.
+
+또한 FSD를 적용할 때 모든 컴포넌트를 억지로 features나 entities에 넣으려고 하면 안 됩니다. 중요한 것은 폴더 이름이 아니라 **책임 분리**입니다. 같은 기능을 수정할 때 관련 코드가 가까이 있고, 외부에서는 정해진 API를 통해서만 접근할 수 있으며, 의존성 방향이 깨지지 않는 것이 핵심입니다.
+
+* * *
+
+## 정리
+
+FSD와 Layered Architecture는 프론트엔드 프로젝트가 커질수록 코드가 뒤엉키는 문제를 해결하기 위한 구조입니다. 핵심은 components, hooks, api처럼 기술 종류별로만 나누는 것이 아니라, user, anime, search, select, share처럼 **도메인과 기능 중심으로 코드를 배치하는 것**입니다.
+
+실제 프로젝트에서는 app, pages, widgets, features, entities, shared 계층을 두고, 상위 계층이 하위 계층을 조합하는 방식으로 설계하는 것이 좋습니다. 또한 각 slice는 index.ts를 통해 Public API를 제공하고, 외부에서는 내부 파일 구조에 직접 접근하지 않도록 관리해야 합니다.

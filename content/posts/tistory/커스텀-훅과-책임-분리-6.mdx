@@ -1,0 +1,387 @@
+---
+title: "커스텀 훅과 책임 분리"
+description: "React 애플리케이션이 커질수록 컴포넌트 내부에는 다양한 로직이 함께 존재하게 됩니다.예를 들어 하나의 컴포넌트 안에는 다음과 같은 코드들이 함께 들어갈 수 있습니다.API 호출상태 관리데이터 가공이벤트 처리UI 렌더링처음에는 간단한 코드로 시작하지만, 프로젝트가 커질수록 하나의 컴…"
+date: "2026-03-15"
+tags: ["react"]
+published: true
+cover: "https://img1.daumcdn.net/thumb/R800x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FZeEHz%2FdJMcad2h0bQ%2FAAAAAAAAAAAAAAAAAAAAAFVB20yJYinEzJA-jde-dU7mzNVaJf8rl9u5V4zGYIzi%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1782831599%26allow_ip%3D%26allow_referer%3D%26signature%3DElUZX6b98tZ%252F4Q1%252BoHv0wjDlU40%253D"
+---
+![](https://blog.kakaocdn.net/dna/pv6hW/dJMcadHZOPo/AAAAAAAAAAAAAAAAAAAAABsAJIPTKGPenmIsTCuZdjhEOk6ch_QsLBMLw_5hRzW5/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1782831599&allow_ip=&allow_referer=&signature=59n8kTIIolYl9GMtYWHMi%2F3Pkdk%3D)
+
+React 애플리케이션이 커질수록 컴포넌트 내부에는 다양한 로직이 함께 존재하게 됩니다.
+
+예를 들어 하나의 컴포넌트 안에는 다음과 같은 코드들이 함께 들어갈 수 있습니다.
+
+-   API 호출
+-   상태 관리
+-   데이터 가공
+-   이벤트 처리
+-   UI 렌더링
+
+처음에는 간단한 코드로 시작하지만, 프로젝트가 커질수록 하나의 컴포넌트 안에 너무 많은 책임이 생기게 됩니다.  
+이렇게 되면 다음과 같은 문제가 발생할 수 있습니다.
+
+-   컴포넌트의 크기가 지나치게 커집니다.
+-   로직 재사용이 어려워집니다.
+-   테스트가 어려워집니다.
+-   유지보수가 어려워집니다.
+
+이러한 문제를 해결하기 위해 React에서는 **로직을 구조화하는 다양한 패턴**을 활용합니다.
+
+대표적으로 다음과 같은 방법들이 있습니다.
+
+-   Custom Hook을 활용한 로직 / UI 분리
+-   useReducer + Context 조합 패턴
+-   Hook Composition 전략
+-   같은 기능을 다양한 훅 구조로 구현해보기
+
+이번 글에서는 위 패턴들을 하나씩 살펴보면서 **React에서 로직을 어떻게 구조화하면 좋은지** 알아보겠습니다.
+
+* * *
+
+## 1\. Custom Hook을 활용한 로직 / UI 분리
+
+React 컴포넌트는 기본적으로 **UI와 로직이 함께 존재하는 구조**입니다.  
+하지만 로직이 많아질수록 컴포넌트의 역할이 지나치게 커질 수 있습니다.
+
+예를 들어 다음과 같은 컴포넌트가 있다고 가정해보겠습니다.
+
+```
+function UserList() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+
+    fetch("/api/users")
+      .then((res) => res.json())
+      .then((data) => {
+        setUsers(data);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return loading...;
+
+  return (
+    
+      {users.map((user) => (
+        {user.name}
+      ))}
+    
+  );
+}
+```
+
+이 컴포넌트는 다음 두 가지 역할을 동시에 수행하고 있습니다.
+
+1\. 데이터를 가져오는 로직  
+2\. UI 렌더링
+
+이처럼 **로직과 UI가 하나의 컴포넌트에 섞여 있는 구조**는 코드가 커질수록 관리하기 어려워집니다.
+
+이때 사용할 수 있는 방법이 바로 **Custom Hook**입니다.
+
+**Custom Hook으로 로직 분리하기**
+
+먼저 데이터 로직을 커스텀 훅으로 분리합니다.
+
+```
+function useUsers() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+
+    fetch("/api/users")
+      .then((res) => res.json())
+      .then((data) => {
+        setUsers(data);
+        setLoading(false);
+      });
+  }, []);
+
+  return { users, loading };
+}
+```
+
+이제 컴포넌트에서는 UI만 담당하게 됩니다.
+
+```
+function UserList() {
+  const { users, loading } = useUsers();
+
+  if (loading) return loading...;
+
+  return (
+    
+      {users.map((user) => (
+        {user.name}
+      ))}
+    
+  );
+}
+```
+
+이렇게 하면 다음과 같은 장점이 있습니다.
+
+**관심사의 분리 (Separation of Concerns)**
+
+-   Hook -> 로직 담당
+-   Component -> UI 담당
+
+**재사용성 증가**
+
+다른 컴포넌트에서도 같은 로직을 사용할 수 있습니다.
+
+```
+function UserCount() {
+  const { users } = useUsers();
+
+  return 총 사용자 수: {users.length};
+}
+```
+
+**테스트 용이성**
+
+UI와 로직이 분리되었기 때문에 **로직만 따로 테스트하는 것도 가능해집니다.**
+
+* * *
+
+## 2\. useReducer + Context 조합 패턴
+
+React에서는 여러 컴포넌트에서 상태를 공유해야 하는 경우가 많습니다.  
+예를 들어 다음과 같은 상태가 있을 수 있습니다.
+
+-   로그인 사용자 정보
+-   장바구니 상태
+-   테마 상태
+-   애플리케이션 설정
+
+이러한 상태를 여러 컴포넌트에서 공유하기 위해 React에서는 **Context API**를 제공합니다.
+
+하지만 상태 로직이 복잡해지면 useState만으로 관리하기 어려워질 수 있습니다.  
+이때 사용할 수 있는 패턴이 바로 **useReducer + Context 조합 패턴**입니다.
+
+**reducer 정의**
+
+먼저 상태 변경 로직을 reducer로 분리합니다.
+
+```
+function counterReducer(state, action) {
+  switch (action.type) {
+    case "INCREMENT":
+      return { count: state.count + 1 };
+
+    case "DECREMENT":
+      return { count: state.count - 1 };
+
+    default:
+      return state;
+  }
+}
+```
+
+**Context 생성**
+
+```
+const CounterContext = createContext(null);
+```
+
+**Provider 구현**
+
+```
+function CounterProvider({ children }) {
+  const [state, dispatch] = useReducer(counterReducer, { count: 0 });
+
+  return (
+    
+      {children}
+    
+  );
+}
+```
+
+**Context 사용**
+
+```
+function Counter() {
+  const { state, dispatch } = useContext(CounterContext);
+
+  return (
+    
+      {state.count}
+      
+       dispatch({ type: "INCREMENT" })}>
+        +
+      
+
+       dispatch({ type: "DECREMENT" })}>
+        -
+      
+    
+  );
+}
+```
+
+이 패턴의 핵심은 **상태 변경 로직을 reducer로 중앙 관리하는 것**입니다.
+
+#### **useReducer + Context 패턴의 장점**
+
+**상태 변경이 명확해집니다**
+
+모든 상태 변경은 action을 통해 이루어집니다.
+
+```
+dispatch({ type: "INCREMENT" })
+```
+
+**상태 로직이 한 곳에 모입니다**
+
+복잡한 상태 로직을 reducer에서 관리할 수 있습니다.
+
+**Redux와 유사한 구조**
+
+React의 기본 기능만으로도 **Redux와 유사한 상태 관리 구조**를 만들 수 있습니다.
+
+* * *
+
+## 3\. Hook Composition 전략
+
+React Hook은 함수이기 때문에 **다른 Hook을 내부에서 사용할 수 있습니다.**  
+이러한 구조를 **Hook Composition**이라고 합니다.
+
+즉, **작은 Hook들을 조합해서 더 큰 Hook을 만드는 방식**입니다.
+
+**예시**
+
+먼저 인증 정보를 관리하는 Hook이 있다고 가정해보겠습니다.
+
+```
+function useAuth() {
+  const [user, setUser] = useState(null);
+
+  return { user, setUser };
+}
+```
+
+이 Hook을 기반으로 **사용자 프로필 Hook을 만들 수 있습니다.**
+
+```
+function useUserProfile() {
+  const { user } = useAuth();
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    if (!user) return;
+
+    fetch(`/api/profile/${user.id}`)
+      .then((res) => res.json())
+      .then(setProfile);
+  }, [user]);
+
+  return profile;
+}
+```
+
+여기서 중요한 점은 다음과 같습니다.
+
+-   작은 Hook → 재사용 가능
+-   큰 Hook → 여러 Hook을 조합
+
+**Hook Composition의 장점**
+
+로직을 작은 단위로 나눌 수 있습니다
+
+예를 들어 다음과 같이 분리할 수 있습니다.
+
+```
+useAuth
+useUser
+useProfile
+```
+
+**재사용성이 높아집니다**
+
+각 Hook은 독립적으로 사용할 수 있습니다.
+
+**복잡한 로직을 단계적으로 구성할 수 있습니다**
+
+작은 기능들을 조합해서 큰 기능을 만들 수 있습니다.
+
+## 4\. 같은 기능을 다양한 훅 구조로 구현해보기
+
+React를 학습할 때 매우 좋은 방법 중 하나는 **같은 기능을 여러 방식으로 구현해보는 것**입니다.
+
+예를 들어 "상품 목록 검색 기능"을 구현한다고 가정해보겠습니다.
+
+**방법 1 - 단순 useState**
+
+```
+const [products, setProducts] = useState([]);
+const [keyword, setKeyword] = useState("");
+```
+
+**방법 2 - Custom Hook**
+
+```
+const { products } = useProducts();
+```
+
+**방법 3 - useReducer**
+
+```
+const [state, dispatch] = useReducer(productReducer);
+```
+
+**방법 4 - Hook Composition**
+
+```
+const { products } = useProducts();
+const { keyword, setKeyword } = useSearch();
+```
+
+이렇게 여러 방식으로 구현해보면 다음과 같은 점을 이해할 수 있습니다.
+
+-   어떤 구조가 가장 읽기 쉬운지
+-   어떤 구조가 확장성이 좋은지
+-   어떤 구조가 재사용성이 높은지
+
+## **마무리**
+
+React에서 좋은 컴포넌트 구조를 설계하기 위해서는 **로직을 어떻게 분리할 것인지**가 매우 중요합니다.
+
+대표적인 방법은 다음과 같습니다.
+
+**패턴목적**
+
+Custom Hook
+
+로직 재사용
+
+useReducer + Context
+
+상태 중앙 관리
+
+Hook Composition
+
+작은 Hook 조합
+
+다양한 구현 방식 실험
+
+설계 능력 향상
+
+결국 핵심은 다음과 같습니다.
+
+**컴포넌트는 가능한 한 UI에 집중하도록 만들고,  
+비즈니스 로직은 Hook으로 분리하는 것**입니다.
+
+이러한 구조를 잘 활용하면
+
+-   코드 재사용성이 높아지고
+-   유지보수가 쉬워지며
+-   확장 가능한 React 애플리케이션을 만들 수 있습니다.
+
+감사합니다!

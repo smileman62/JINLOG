@@ -1,7 +1,7 @@
 import type { BlogPost } from "@/lib/blog/types";
 import Image from "next/image";
 import Link from "next/link";
-import { categoryHeroImage, categoryLabels } from "@/lib/blog/data";
+import { categoryHeroImage, categoryLabels } from "@/lib/blog/constants";
 import { estimateReadingMinutes } from "@/lib/blog/format";
 
 type BlogPostCardProps = {
