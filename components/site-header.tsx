@@ -18,16 +18,20 @@ function isNavActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
+function navLinkClass(active: boolean) {
+  return active
+    ? "font-medium text-[#0f0f0f] dark:text-zinc-50"
+    : "text-[#888] hover:text-[#0f0f0f] dark:text-zinc-500 dark:hover:text-zinc-100";
+}
+
 function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  /** true = 가로로 접힘(중간) → 테마 전환 후 펼침 (backdrop-blur 환경에서도 동작) */
   const [squashed, setSquashed] = useState(false);
   const busyRef = useRef(false);
   const layerRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    // 테마 아이콘은 클라이언트에서만 결정 (서버/클라 불일치 방지)
     // eslint-disable-next-line react-hooks/set-state-in-effect -- 마운트 후에만 표시
     setMounted(true);
   }, []);
@@ -86,7 +90,7 @@ function ThemeToggle() {
   if (!mounted) {
     return (
       <span
-        className="inline-flex h-9 w-9 shrink-0 rounded-lg border border-zinc-200 bg-transparent dark:border-zinc-700"
+        className="inline-flex h-8 w-8 shrink-0 rounded-full border border-[#e8e8e8] dark:border-zinc-700"
         aria-hidden
       />
     );
@@ -96,20 +100,20 @@ function ThemeToggle() {
     <button
       type="button"
       onClick={handleToggle}
-      className="inline-flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-zinc-200 bg-transparent text-foreground transition-[transform] hover:opacity-80 active:scale-95 active:duration-100 dark:border-zinc-700"
+      className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[#e8e8e8] text-[#888] transition-colors hover:border-[#0f0f0f] hover:text-[#0f0f0f] dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-300 dark:hover:text-zinc-100"
       aria-label={isDark ? "라이트 모드로 전환" : "다크 모드로 전환"}
     >
       <span
         ref={layerRef}
-        className="inline-flex h-[18px] w-[18px] origin-center will-change-transform transition-[transform] duration-[240ms] ease-in-out motion-reduce:transition-none motion-reduce:duration-0"
+        className="inline-flex h-[16px] w-[16px] origin-center will-change-transform transition-[transform] duration-[240ms] ease-in-out motion-reduce:transition-none motion-reduce:duration-0"
         style={{
           transform: squashed ? "scaleX(0)" : "scaleX(1)",
         }}
       >
         {isDark ? (
-          <SunIcon className="h-[18px] w-[18px]" aria-hidden />
+          <SunIcon className="h-[16px] w-[16px]" aria-hidden />
         ) : (
-          <MoonIcon className="h-[18px] w-[18px]" aria-hidden />
+          <MoonIcon className="h-[16px] w-[16px]" aria-hidden />
         )}
       </span>
     </button>
@@ -153,40 +157,40 @@ function MoonIcon({ className }: { className?: string }) {
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const isHome = pathname === "/";
 
   return (
-    <header className="sticky top-0 z-40 border-b border-zinc-200/80 bg-background/80 backdrop-blur-md dark:border-zinc-800/80">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <div className="flex items-center gap-4">
-          <Link
-            href="/"
-            className="shrink-0 text-lg font-semibold tracking-tight text-foreground"
-          >
-            JINLOG
-          </Link>
-          <nav
-            className="flex min-w-0 flex-1 items-center justify-center overflow-x-auto gap-4"
-            aria-label="주요 메뉴"
-          >
+    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md dark:bg-background/80">
+      <div className="mx-auto flex max-w-[104rem] items-center justify-between gap-4 px-4 py-6 sm:px-8 lg:px-16 lg:py-8">
+        <Link
+          href="/"
+          className={`font-[family-name:var(--font-syne)] text-[0.9rem] font-extrabold tracking-[-0.01em] transition-colors ${
+            isHome
+              ? "text-[#0f0f0f] dark:text-zinc-50"
+              : "text-[#888] hover:text-[#0f0f0f] dark:text-zinc-500 dark:hover:text-zinc-100"
+          }`}
+        >
+          JS.
+        </Link>
+
+        <div className="flex items-center gap-8 sm:gap-12">
+          <nav className="flex items-center gap-5 sm:gap-10" aria-label="주요 메뉴">
             {nav.map(({ href, label }) => {
               const active = isNavActive(pathname, href);
               return (
                 <Link
                   key={href}
                   href={href}
-                  className={`whitespace-nowrap rounded-md px-1 py-1 text-sm transition-colors ${
-                    active
-                      ? "font-bold text-zinc-900 dark:text-zinc-50"
-                      : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
-                  }`}
+                  aria-current={active ? "page" : undefined}
+                  className={`font-[family-name:var(--font-space-mono)] text-[0.68rem] tracking-[0.14em] uppercase transition-colors ${navLinkClass(active)}`}
                 >
                   {label}
                 </Link>
               );
             })}
           </nav>
+          <ThemeToggle />
         </div>
-        <ThemeToggle />
       </div>
     </header>
   );

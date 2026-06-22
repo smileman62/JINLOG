@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "@wrksz/themes/next";
-import { Gaegu, Geist_Mono, Noto_Serif_KR, Space_Mono } from "next/font/google";
+import { SiteHeader } from "@/components/site-header";
+import { DM_Sans, Gaegu, Geist_Mono, Noto_Serif_KR, Space_Mono, Syne } from "next/font/google";
 import { getSiteUrl, siteDescription, siteName } from "@/lib/site";
 import "./globals.css";
 
@@ -19,6 +20,18 @@ const spaceMono = Space_Mono({
   variable: "--font-space-mono",
   subsets: ["latin"],
   weight: ["400", "700"],
+});
+
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+});
+
+const syne = Syne({
+  variable: "--font-syne",
+  subsets: ["latin"],
+  weight: ["400", "700", "800"],
 });
 
 const notoSerifKr = Noto_Serif_KR({
@@ -79,7 +92,7 @@ export default async function RootLayout({
     <html
       lang="ko"
       suppressHydrationWarning
-      className={`${geistMono.variable} ${gaegu.variable} ${spaceMono.variable} ${notoSerifKr.variable}`}
+      className={`${geistMono.variable} ${gaegu.variable} ${spaceMono.variable} ${dmSans.variable} ${syne.variable} ${notoSerifKr.variable}`}
     >
       <body>
         <ThemeProvider
@@ -88,7 +101,10 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <div className="flex min-h-dvh flex-col">
+            <SiteHeader />
+            {children}
+          </div>
         </ThemeProvider>
       </body>
     </html>
