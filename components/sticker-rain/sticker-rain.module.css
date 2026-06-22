@@ -1,0 +1,56 @@
+.rainLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.rainSticker {
+  position: absolute;
+  top: -18vh;
+  object-fit: contain;
+  filter: saturate(1.05);
+  will-change: transform;
+  animation-name: rainFall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.rainToggle {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 50;
+  border-radius: 9999px;
+  border: 1px solid rgba(24, 24, 27, 0.2);
+  background: rgba(20, 20, 20, 0.88);
+  padding: 0.5rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #c9f135;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+
+.rainToggle:hover {
+  opacity: 0.9;
+}
+
+@keyframes rainFall {
+  0% {
+    transform: translate3d(0, -10vh, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate3d(var(--drift-x, 0px), 130vh, 0) rotate(var(--spin, 0deg));
+  }
+}
+
+@media (max-width: 767px) {
+  .rainToggle {
+    right: 0.75rem;
+    bottom: 0.75rem;
+    font-size: 0.7rem;
+    padding: 0.45rem 0.75rem;
+  }
+}

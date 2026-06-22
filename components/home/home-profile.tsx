@@ -1,147 +1,22 @@
 "use client";
-import type { CSSProperties } from "react";
-import { useEffect, useState } from "react";
+
+import { StickerRain } from "@/components/sticker-rain/sticker-rain";
 import styles from "@/components/home/home-profile.module.css";
 
-const rainStickerSources = [
-  "/apple.png",
-  "/BT.png",
-  "/corn.png",
-  "/diamondSword.png",
-  "/fineMeal.png",
-  "/gojo.png",
-  "/helldivers1.png",
-  "/helldivers2.png",
-  "/ironPickaxe.png",
-  "/LavishMeal.png",
-  "/mariomushroom.png",
-  "/Muffalo.png",
-  "/naruto.png",
-  "/narutoTomo.png",
-  "/potato.png",
-  "/react.png",
-  "/simpleMeal.png",
-  "/steve.png",
-  "/typescript.png",
-];
-
-function shuffle<T>(items: T[]) {
-  const arr = [...items];
-  for (let i = arr.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-type RainSticker = {
-  id: number;
-  src: string;
-  left: number;
-  size: number;
-  duration: number;
-  delay: number;
-  drift: number;
-  rotate: number;
-  opacity: number;
-};
-
-function createRainSticker(id: number, src: string): RainSticker {
-  return {
-    id,
-    src,
-    left: 2 + Math.random() * 80,
-    size: 50 + Math.random() * 20,
-    duration: 20 + Math.random() * 50,
-    delay: Math.random() * 12,
-    drift: -14 + Math.random() * 28,
-    rotate: -10 + Math.random() * 20,
-    opacity: 0.15 + Math.random() * 0.18,
-  };
-}
-
-function pickRandomSource(excluding: Set<string>) {
-  const available = rainStickerSources.filter((src) => !excluding.has(src));
-  const pool = available.length > 0 ? available : rainStickerSources;
-  return pool[Math.floor(Math.random() * pool.length)];
-}
-
 export function HomeProfile() {
-  const [isRainEnabled, setIsRainEnabled] = useState(true);
-  const [rainStickers, setRainStickers] = useState<RainSticker[]>([]);
   const spaceMonoStyle = { fontFamily: "var(--font-space-mono), monospace" } as const;
-
-  useEffect(() => {
-    const shuffledSources = shuffle(rainStickerSources);
-    setRainStickers(
-      Array.from({ length: 8 }, (_, idx) =>
-        createRainSticker(idx, shuffledSources[idx % shuffledSources.length]),
-      ),
-    );
-  }, []);
-
-  const handleStickerCycle = (stickerId: number) => {
-    setRainStickers((prev) => {
-      const usedSources = new Set(
-        prev.filter((item) => item.id !== stickerId).map((item) => item.src),
-      );
-      const nextSource = pickRandomSource(usedSources);
-      return prev.map((item) =>
-        item.id === stickerId
-          ? {
-              ...item,
-              src: nextSource,
-              opacity: 0.15 + Math.random() * 0.18,
-            }
-          : item,
-      );
-    });
-  };
 
   return (
     <section
       className={`${styles.section} w-full px-3 py-6 pb-28 sm:px-6 sm:py-8 sm:pb-32 md:pb-36`}
     >
-      {isRainEnabled && (
-        <div className={styles.rainLayer} aria-hidden>
-          {rainStickers.map((sticker) => (
-            <img
-              key={sticker.id}
-              src={sticker.src}
-              alt=""
-              className={styles.rainSticker}
-              onAnimationIteration={() => handleStickerCycle(sticker.id)}
-              style={
-                {
-                  left: `${sticker.left}%`,
-                  width: `${sticker.size}px`,
-                  animationDuration: `${sticker.duration}s`,
-                  animationDelay: `-${sticker.delay}s`,
-                  "--drift-x": `${sticker.drift}px`,
-                  "--spin": `${sticker.rotate}deg`,
-                  opacity: sticker.opacity,
-                } as CSSProperties
-              }
-            />
-          ))}
-        </div>
-      )}
-
-      <button
-        type="button"
-        onClick={() => setIsRainEnabled((prev) => !prev)}
-        className={styles.rainToggle}
-        aria-pressed={isRainEnabled}
-      >
-        {isRainEnabled ? "스티커 비 끄기" : "스티커 비 켜기"}
-      </button>
+      <StickerRain />
 
       <div className={styles.board}>
         <div
           className={`${styles.sticker} ${styles.now} rounded-xl bg-[#1a1a2e] px-4 py-3 text-white`}
           style={{ animationDelay: "0.08s" }}
         >
-          <div className={styles.tapeSm} />
           <div className="text-xs tracking-[0.12em] text-[#c9f135] md:text-sm lg:text-base">
             ✦ NOW WRITING
           </div>
@@ -161,7 +36,6 @@ export function HomeProfile() {
           className={`${styles.sticker} ${styles.about} rounded-[5px] bg-[#ffe566] px-5 py-4`}
           style={{ animationDelay: "0.06s" }}
         >
-          <div className={styles.tape} />
           <p
             className="text-md text-zinc-800 md:text-lg lg:text-xl"
             style={{ fontFamily: "var(--font-gaegu), cursive" }}
@@ -178,7 +52,6 @@ export function HomeProfile() {
           className={`${styles.sticker} ${styles.phil} rounded-[14px] border border-[#e8e4dc] bg-white px-5 py-4`}
           style={{ animationDelay: "0.14s" }}
         >
-          <div className={styles.tape} />
           <div
             className="text-xs uppercase tracking-[0.16em] text-zinc-400 lg:text-sm"
             style={spaceMonoStyle}
@@ -198,7 +71,6 @@ export function HomeProfile() {
           className={`${styles.sticker} ${styles.awards} rounded-[14px] bg-[#ff5252] px-5 py-4 text-white`}
           style={{ animationDelay: "0.22s" }}
         >
-          <div className={styles.tape} />
           <div
             className="text-xs uppercase tracking-[0.16em] text-white/60 lg:text-sm"
             style={spaceMonoStyle}
@@ -217,7 +89,6 @@ export function HomeProfile() {
           className={`${styles.sticker} ${styles.name} rounded-[18px] bg-[#141414] px-7 py-7 text-white md:px-8 md:py-8 lg:px-10 lg:py-10 xl:px-12 xl:py-11`}
           style={{ animationDelay: "0.32s" }}
         >
-          <div className={styles.tape} />
           <div className="text-xs tracking-[0.2em] text-zinc-500 md:text-sm lg:text-base">
             KIM JINSEONG · FRONTEND
           </div>
@@ -257,7 +128,6 @@ export function HomeProfile() {
           className={`${styles.sticker} ${styles.stack} rounded-[14px] bg-[#c4adff] px-5 py-4`}
           style={{ animationDelay: "0.1s", ...spaceMonoStyle }}
         >
-          <div className={styles.tape} />
           <div
             className="text-xs uppercase tracking-[0.16em] text-zinc-700 lg:text-sm"
             style={spaceMonoStyle}
@@ -282,7 +152,6 @@ export function HomeProfile() {
           className={`${styles.sticker} ${styles.projects} rounded-[14px] bg-[#4dbbff] px-5 py-4`}
           style={{ animationDelay: "0.18s" }}
         >
-          <div className={styles.tape} />
           <div
             className="text-xs uppercase tracking-[0.16em] text-zinc-700 lg:text-sm"
             style={spaceMonoStyle}
@@ -313,7 +182,6 @@ export function HomeProfile() {
           className={`${styles.sticker} ${styles.edu} rounded-[14px] bg-[#c9f135] px-5 py-4`}
           style={{ animationDelay: "0.26s" }}
         >
-          <div className={styles.tape} />
           <div
             className="text-xs uppercase tracking-[0.16em] text-zinc-700 lg:text-sm"
             style={spaceMonoStyle}
@@ -333,7 +201,6 @@ export function HomeProfile() {
           className={`${styles.sticker} ${styles.cert} rounded-[10px] border border-[#e0dbd0] bg-white px-4 py-3`}
           style={{ animationDelay: "0.48s" }}
         >
-          <div className={styles.tapeSm} />
           <div
             className="text-xs uppercase tracking-[0.16em] text-zinc-400 lg:text-sm"
             style={spaceMonoStyle}
