@@ -1,0 +1,71 @@
+.row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.sticker {
+  box-shadow: 3px 5px 16px rgba(0, 0, 0, 0.13), 0 1px 3px rgba(0, 0, 0, 0.07);
+}
+
+.progressBar {
+  animation: prog 3s ease-in-out infinite alternate;
+}
+
+.name {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.nameInner {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .nameInner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .actions {
+    align-items: flex-end;
+  }
+}
+
+.now {
+  display: none;
+  flex: 0 0 auto;
+  width: 210px;
+  height: fit-content;
+}
+
+@media (min-width: 640px) {
+  .now {
+    display: block;
+  }
+}
+
+@keyframes prog {
+  0% {
+    width: 55%;
+  }
+  100% {
+    width: 78%;
+  }
+}

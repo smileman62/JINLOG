@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { BlogFeaturedPost } from "@/components/blog/blog-featured-post";
 import { BlogRecentPosts } from "@/components/blog/blog-recent-posts";
+import { BlogStickerHero } from "@/components/blog/blog-sticker-hero";
+import enter from "@/components/blog/blog-enter.module.css";
 import { JsonLd } from "@/components/seo/json-ld";
 import { getAllPosts } from "@/lib/blog/data";
 import { blogPageJsonLd } from "@/lib/seo";
@@ -40,13 +42,17 @@ export default function BlogLandingPage() {
     <div className="mx-auto max-w-6xl">
       <JsonLd data={blogPageJsonLd()} />
 
+      <BlogStickerHero nowWritingTitle={featured?.title} />
+
       {featured ? (
         <BlogFeaturedPost post={featured} />
       ) : (
-        <p className="rounded-xl border border-dashed border-zinc-300 px-4 py-16 text-center text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+        <p
+          className={`rounded-xl border border-dashed border-zinc-300 px-4 py-16 text-center text-zinc-500 dark:border-zinc-700 dark:text-zinc-400 ${enter.enter}`}
+          style={{ animationDelay: "0.22s" }}
+        >
           아직 게시된 글이 없습니다.
-        </p>
-      )}
+        </p>      )}
 
       <BlogRecentPosts posts={recentPosts} />
     </div>

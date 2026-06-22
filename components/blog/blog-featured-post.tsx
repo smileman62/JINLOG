@@ -1,6 +1,7 @@
 import type { BlogPost } from "@/lib/blog/types";
 import Image from "next/image";
 import Link from "next/link";
+import enter from "@/components/blog/blog-enter.module.css";
 import { categoryHeroImage, categoryLabels } from "@/lib/blog/constants";
 import { formatDateDot } from "@/lib/blog/format";
 
@@ -12,7 +13,10 @@ export function BlogFeaturedPost({ post }: BlogFeaturedPostProps) {
   const coverSrc = post.cover ?? categoryHeroImage[post.category];
 
   return (
-    <section className="flex flex-col gap-4">
+    <section
+      className={`flex flex-col gap-4 ${enter.enter}`}
+      style={{ animationDelay: "0.22s" }}
+    >
       <p className="text-xs font-medium tracking-[0.2em] text-zinc-400 uppercase dark:text-zinc-500">
         Featured
       </p>
