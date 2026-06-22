@@ -1,0 +1,52 @@
+.nameSpotlight {
+  position: relative;
+  display: block;
+  cursor: default;
+}
+
+.base {
+  display: block;
+}
+
+.reveal {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+  color: #3182f6;
+  -webkit-text-stroke: 2px #0f0f0f;
+  paint-order: stroke fill;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  -webkit-mask-image: radial-gradient(
+    circle 4.5rem at var(--mx, -999px) var(--my, -999px),
+    #000 0%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    circle 4.5rem at var(--mx, -999px) var(--my, -999px),
+    #000 0%,
+    transparent 100%
+  );
+}
+
+:global(.dark) .reveal {
+  color: #6eb0ff;
+  -webkit-text-stroke: 2px #fafafa;
+}
+
+.isActive .reveal {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    transition: none;
+  }
+
+  .isActive .reveal {
+    -webkit-mask-image: none;
+    mask-image: none;
+    opacity: 1;
+  }
+}

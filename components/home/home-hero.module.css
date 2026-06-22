@@ -1,0 +1,300 @@
+.root {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+.page {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  flex-direction: column;
+}
+
+.heroCenter {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 0;
+  padding-bottom: 2.5rem;
+  pointer-events: none;
+}
+
+.hero {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e8e8e8;
+  border-radius: 100px;
+  padding: 0.3rem 0.85rem;
+  animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}
+
+:global(.dark) .status {
+  border-color: #2a2a2a;
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: blink 2s infinite;
+}
+
+.statusText {
+  font-family: var(--font-space-mono), monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #888;
+}
+
+:global(.dark) .statusText {
+  color: #a1a1aa;
+}
+
+.nameLine {
+  display: block;
+  overflow: hidden;
+}
+
+.nameInner {
+  display: block;
+  transform: translateY(110%);
+  animation: slideUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  font-family: var(--font-dm-sans), var(--font-sans), sans-serif;
+  font-size: clamp(2.5rem, 8vw, 6rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: #0f0f0f;
+}
+
+.nameLine:first-child .nameInner {
+  animation-delay: 0.4s;
+}
+
+.nameLine:last-child .nameInner {
+  animation-delay: 0.52s;
+}
+
+:global(.dark) .nameInner {
+  color: #fafafa;
+}
+
+.nameAccent {
+  color: #ffffff;
+  -webkit-text-stroke: 2px #0f0f0f;
+  paint-order: stroke fill;
+}
+
+:global(.dark) .nameAccent {
+  color: #0a0a0a;
+  -webkit-text-stroke: 2px #fafafa;
+}
+
+.lineAnim {
+  width: 0;
+  height: 1px;
+  margin: 1.25rem 0;
+  background: #0f0f0f;
+  animation: expandLine 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1.1s both;
+}
+
+:global(.dark) .lineAnim {
+  background: #fafafa;
+}
+
+.bottomRow {
+  animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 1.3s both;
+}
+
+.role {
+  font-family: var(--font-space-mono), monospace;
+  font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #888;
+}
+
+:global(.dark) .role {
+  color: #a1a1aa;
+}
+
+.roleEm {
+  font-style: normal;
+  font-weight: 500;
+  color: #0f0f0f;
+}
+
+:global(.dark) .roleEm {
+  color: #fafafa;
+}
+
+.foot {
+  position: absolute;
+  right: 0;
+  bottom: 1.5rem;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.6s both;
+}
+
+.footLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.footLink {
+  pointer-events: auto;
+  font-family: var(--font-space-mono), monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #888;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+:global(.dark) .footLink {
+  color: #a1a1aa;
+}
+
+.footLink:hover {
+  color: #0f0f0f;
+}
+
+:global(.dark) .footLink:hover {
+  color: #fafafa;
+}
+
+.cta {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  border-radius: 100px;
+  border: none;
+  background: #0f0f0f;
+  padding: 0.65rem 1.4rem;
+  font-family: var(--font-space-mono), monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+:global(.dark) .cta {
+  background: #fafafa;
+  color: #0f0f0f;
+}
+
+.cta:hover {
+  transform: scale(1.04);
+}
+
+:global(.dark) .cta:hover {
+  background: #e4e4e7;
+}
+
+.ctaArrow {
+  transition: transform 0.2s;
+}
+
+.cta:hover .ctaArrow {
+  transform: translateX(3px);
+}
+
+.limeSq {
+  pointer-events: none;
+  position: fixed;
+  right: 1rem;
+  top: 50%;
+  z-index: 2;
+  width: 6px;
+  height: 6px;
+  transform: translateY(-50%);
+  background: #bfeb34;
+  animation: fadeUp 0.5s ease 1.5s both;
+}
+
+@media (min-width: 1024px) {
+  .limeSq {
+    right: 4rem;
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes expandLine {
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status,
+  .nameInner,
+  .lineAnim,
+  .bottomRow,
+  .foot,
+  .limeSq,
+  .statusDot {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    width: 100%;
+  }
+}
