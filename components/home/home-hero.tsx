@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { HeroCursorPhotos } from "@/components/home/hero-cursor-photos";
 import { NameSpotlight } from "@/components/home/name-spotlight";
 import styles from "./home-hero.module.css";
 
@@ -7,15 +6,8 @@ export function HomeHero() {
   return (
     <div className={styles.root}>
       <div className={styles.page}>
-        <HeroCursorPhotos />
-
         <div className={styles.heroCenter}>
           <div className={styles.hero}>
-            <div className={styles.status}>
-              <span className={styles.statusDot} aria-hidden />
-              <span className={styles.statusText}>Available for work</span>
-            </div>
-
             <h1>
               <span className={styles.nameLine}>
                 <span className={styles.nameInner}>Frontend Developer</span>
@@ -36,6 +28,15 @@ export function HomeHero() {
                 <em className={styles.roleEm}>User-first frontend development</em>
               </p>
             </div>
+
+            <div className={styles.heroActions}>
+              <Link className={styles.heroBtn} href="/blog">
+                블로그 보기 <span className={styles.heroBtnArrow}>→</span>
+              </Link>
+              <Link className={`${styles.heroBtn} ${styles.heroBtnOutline}`} href="/projects">
+                프로젝트 보기 <span className={styles.heroBtnArrow}>→</span>
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -49,16 +50,10 @@ export function HomeHero() {
             >
               GitHub
             </a>
-            <Link className={styles.footLink} href="/blog">
-              Blog
-            </Link>
             <a className={styles.footLink} href="mailto:jskim6335@naver.com">
               Email
             </a>
           </div>
-          <Link className={styles.cta} href="/projects">
-            View Projects <span className={styles.ctaArrow}>→</span>
-          </Link>
         </footer>
       </div>
 

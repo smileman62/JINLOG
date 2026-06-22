@@ -26,48 +26,12 @@
   align-items: flex-start;
   min-height: 0;
   padding-bottom: 2.5rem;
-  pointer-events: none;
 }
 
 .hero {
   position: relative;
   z-index: 1;
   width: 100%;
-}
-
-.status {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-  border: 1px solid #e8e8e8;
-  border-radius: 100px;
-  padding: 0.3rem 0.85rem;
-  animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
-}
-
-:global(.dark) .status {
-  border-color: #2a2a2a;
-}
-
-.statusDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #22c55e;
-  animation: blink 2s infinite;
-}
-
-.statusText {
-  font-family: var(--font-space-mono), monospace;
-  font-size: 0.62rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #888;
-}
-
-:global(.dark) .statusText {
-  color: #a1a1aa;
 }
 
 .nameLine {
@@ -148,6 +112,77 @@
   color: #fafafa;
 }
 
+.heroActions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.85rem;
+  width: min(100%, 15rem);
+  margin-top: 2.25rem;
+  margin-inline: auto;
+  animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 1.45s both;
+}
+
+.heroBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  border-radius: 100px;
+  border: none;
+  background: #0f0f0f;
+  padding: 0.9rem 1.5rem;
+  font-family: var(--font-dm-sans), var(--font-sans), sans-serif;
+  font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: #fff;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+:global(.dark) .heroBtn {
+  background: #fafafa;
+  color: #0f0f0f;
+}
+
+.heroBtn:hover {
+  transform: scale(1.04);
+}
+
+:global(.dark) .heroBtn:hover {
+  background: #e4e4e7;
+}
+
+.heroBtnOutline {
+  border: 1px solid #e8e8e8;
+  background: transparent;
+  color: #0f0f0f;
+}
+
+:global(.dark) .heroBtnOutline {
+  border-color: #2a2a2a;
+  background: transparent;
+  color: #fafafa;
+}
+
+.heroBtnOutline:hover {
+  background: rgba(15, 15, 15, 0.04);
+}
+
+:global(.dark) .heroBtnOutline:hover {
+  background: rgba(250, 250, 250, 0.06);
+}
+
+.heroBtnArrow {
+  transition: transform 0.2s;
+}
+
+.heroBtn:hover .heroBtnArrow {
+  transform: translateX(3px);
+}
+
 .foot {
   position: absolute;
   right: 0;
@@ -169,7 +204,6 @@
 }
 
 .footLink {
-  pointer-events: auto;
   font-family: var(--font-space-mono), monospace;
   font-size: 0.62rem;
   letter-spacing: 0.12em;
@@ -189,45 +223,6 @@
 
 :global(.dark) .footLink:hover {
   color: #fafafa;
-}
-
-.cta {
-  pointer-events: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  border-radius: 100px;
-  border: none;
-  background: #0f0f0f;
-  padding: 0.65rem 1.4rem;
-  font-family: var(--font-space-mono), monospace;
-  font-size: 0.7rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #fff;
-  text-decoration: none;
-  transition: background 0.2s, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-:global(.dark) .cta {
-  background: #fafafa;
-  color: #0f0f0f;
-}
-
-.cta:hover {
-  transform: scale(1.04);
-}
-
-:global(.dark) .cta:hover {
-  background: #e4e4e7;
-}
-
-.ctaArrow {
-  transition: transform 0.2s;
-}
-
-.cta:hover .ctaArrow {
-  transform: translateX(3px);
 }
 
 .limeSq {
@@ -273,25 +268,13 @@
   }
 }
 
-@keyframes blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.3;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .status,
   .nameInner,
   .lineAnim,
   .bottomRow,
+  .heroActions,
   .foot,
-  .limeSq,
-  .statusDot {
+  .limeSq {
     animation: none;
     opacity: 1;
     transform: none;

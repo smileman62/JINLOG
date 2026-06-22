@@ -1,7 +1,7 @@
 .nameSpotlight {
   position: relative;
   display: block;
-  cursor: default;
+  pointer-events: none;
 }
 
 .base {
