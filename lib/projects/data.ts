@@ -19,8 +19,7 @@ export const projects: Project[] = [
       "모바일 카메라 기반 비접촉 생체 신호(rPPG)와 심리 진단(MWS)을 결합한 통합 멘탈 헬스케어 서비스",
     role: "Frontend Developer @ 플래드랩스",
     stack: ["React", "React Native", "TypeScript", "Zustand", "Shadcn"],
-    image:
-      "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&h=800&q=80",
+    image: "/images/projects/maeum-moeum.png",
   },
   {
     id: "dkaffeine",
@@ -30,8 +29,7 @@ export const projects: Project[] = [
       "RAG 기반 챗봇을 효율적으로 관리하기 위한 통합 관리자 플랫폼",
     role: "단독 프론트엔드 개발 · 팀 리딩",
     stack: ["Next.js", "TypeScript", "Zustand", "WebSocket", "Recharts"],
-    image:
-      "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&h=800&q=80",
+    image: "/images/projects/dkaffeine.png",
     award: "카카오 SW아카데미 표창 · 우수팀 선정",
   },
   {
@@ -54,8 +52,7 @@ export const projects: Project[] = [
       "감각과 취향에 기반한 개인화 향수 큐레이션 서비스",
     role: "FE 리더",
     stack: ["React", "TypeScript", "Framer Motion", "Axios"],
-    image:
-      "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=1200&h=800&q=80",
+    image: "/images/projects/perfume-on-me.png",
     award: "UMC 8기 데모데이 최우수상",
   },
 ];

@@ -161,7 +161,7 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md dark:bg-background/80">
-      <div className="mx-auto flex max-w-[104rem] items-center justify-between gap-4 px-4 py-6 sm:px-8 lg:px-16 lg:py-8">
+      <div className="mx-auto flex max-w-[104rem] items-center justify-between gap-4 px-4 py-3 sm:px-8 lg:px-16 lg:py-4">
         <Link
           href="/"
           className={`font-[family-name:var(--font-syne)] text-[0.9rem] font-extrabold tracking-[-0.01em] transition-colors ${

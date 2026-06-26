@@ -78,40 +78,64 @@ export function ProjectCarousel({ projects }: ProjectCarouselProps) {
       aria-label="프로젝트 캐러셀"
       aria-live="polite"
     >
+      <div
+        className="mb-5 flex justify-center gap-2"
+        role="tablist"
+        aria-label="프로젝트 선택"
+      >
+        {projects.map((project, dotIndex) => (
+          <button
+            key={project.id}
+            type="button"
+            role="tab"
+            aria-label={`${project.name} 보기`}
+            aria-selected={dotIndex === index}
+            onClick={() => setIndex(dotIndex)}
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              dotIndex === index
+                ? "w-6 bg-foreground"
+                : "w-1.5 bg-zinc-300 hover:bg-zinc-400 dark:bg-zinc-600 dark:hover:bg-zinc-500"
+            }`}
+          />
+        ))}
+      </div>
+
       <div className="relative">
-        <div className="overflow-hidden">
-          <div
-            className="flex transition-transform duration-700 ease-in-out"
-            style={{ transform: `translateX(-${index * 100}%)` }}
-          >
-            {projects.map((project) => (
-              <article key={project.id} className="w-full shrink-0">
-                <div className="relative mx-auto aspect-16/10 max-w-3xl overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-100 shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
-                  <Image
-                    src={project.image}
-                    alt={`${project.name} 프로젝트 이미지`}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 768px"
-                    className="object-cover"
-                    priority={project.id === projects[0].id}
-                  />
-                  <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/15 to-transparent" />
-                  <div className="absolute right-5 bottom-5 left-5 text-white">
-                    <p className="text-xs font-medium tracking-wider text-white/70 uppercase">
-                      {project.period}
-                    </p>
-                    <h3 className="mt-1 text-2xl font-bold">
-                      {project.name}
-                      {project.nameKo ? (
-                        <span className="ml-2 text-base font-normal text-white/80">
-                          {project.nameKo}
-                        </span>
-                      ) : null}
-                    </h3>
+        <div className="relative mx-auto max-w-2xl">
+          <div className="overflow-hidden">
+            <div
+              className="flex transition-transform duration-700 ease-in-out"
+              style={{ transform: `translateX(-${index * 100}%)` }}
+            >
+              {projects.map((project) => (
+                <article key={project.id} className="w-full shrink-0">
+                  <div className="relative aspect-16/10 overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-100 shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
+                    <Image
+                      src={project.image}
+                      alt={`${project.name} 프로젝트 이미지`}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 672px"
+                      className="object-cover"
+                      priority={project.id === projects[0].id}
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/15 to-transparent" />
+                    <div className="absolute right-5 bottom-5 left-5 text-white">
+                      <p className="text-xs font-medium tracking-wider text-white/70 uppercase">
+                        {project.period}
+                      </p>
+                      <h3 className="mt-1 text-2xl font-bold">
+                        {project.name}
+                        {project.nameKo ? (
+                          <span className="ml-2 text-base font-normal text-white/80">
+                            {project.nameKo}
+                          </span>
+                        ) : null}
+                      </h3>
+                    </div>
                   </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -133,17 +157,12 @@ export function ProjectCarousel({ projects }: ProjectCarouselProps) {
         </button>
       </div>
       <div className="mx-auto mt-8 max-w-2xl space-y-3 text-center">
-        <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-          {current.role}
-        </p>
         <p className="text-base leading-relaxed text-foreground">
           {current.description}
         </p>
-        {current.award ? (
-          <p className="text-sm font-medium text-sky-600 dark:text-sky-400">
-            🏆 {current.award}
-          </p>
-        ) : null}
+        <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+          {current.role}
+        </p>
         <div className="flex flex-wrap justify-center gap-1.5 pt-1">
           {current.stack.map((tech) => (
             <span
@@ -154,23 +173,11 @@ export function ProjectCarousel({ projects }: ProjectCarouselProps) {
             </span>
           ))}
         </div>
-      </div>
-
-      <div className="mt-6 flex justify-center gap-2">
-        {projects.map((project, dotIndex) => (
-          <button
-            key={project.id}
-            type="button"
-            aria-label={`${project.name} 보기`}
-            aria-current={dotIndex === index ? "true" : undefined}
-            onClick={() => setIndex(dotIndex)}
-            className={`h-1.5 rounded-full transition-all duration-300 ${
-              dotIndex === index
-                ? "w-6 bg-foreground"
-                : "w-1.5 bg-zinc-300 dark:bg-zinc-600"
-            }`}
-          />
-        ))}
+        {current.award ? (
+          <p className="pt-1 text-sm font-medium text-sky-600 dark:text-sky-400">
+            🏆 {current.award}
+          </p>
+        ) : null}
       </div>
     </section>
   );
