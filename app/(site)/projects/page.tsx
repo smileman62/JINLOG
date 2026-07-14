@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { ProjectCarousel } from "@/components/projects/project-carousel";
+import { ProjectsView } from "@/components/projects/projects-view";
 import { projects } from "@/lib/projects/data";
 import { siteName } from "@/lib/site";
+import layoutStyles from "./projects-layout.module.css";
 
 export const metadata: Metadata = {
   title: "Projects",
@@ -18,8 +19,8 @@ export const metadata: Metadata = {
 
 export default function ProjectsPage() {
   return (
-    <div className="mx-auto max-w-5xl">
-      <ProjectCarousel projects={projects} />
+    <div className={layoutStyles.shell}>
+      <ProjectsView projects={projects} />
     </div>
   );
 }
