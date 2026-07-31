@@ -31,9 +31,6 @@ export function BlogPostHeader({ post }: BlogPostHeaderProps) {
         <h1 className="text-2xl font-bold leading-tight tracking-tight sm:text-3xl lg:text-4xl">
           {post.title}
         </h1>
-        <p className="text-base leading-relaxed text-zinc-600 sm:text-lg dark:text-zinc-300">
-          {post.description}
-        </p>
       </div>
       {post.tags.length > 0 ? (
         <ul className="flex flex-wrap gap-2" aria-label="태그">

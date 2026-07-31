@@ -66,7 +66,7 @@ export default async function BlogPostsPage(
   );
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8">
+    <div className="mx-auto max-w-4xl space-y-8">
       <JsonLd data={blogPostsPageJsonLd()} />
       <BlogHero
         imageSrc={categoryHeroImage[category]}

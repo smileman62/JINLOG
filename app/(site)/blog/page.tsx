@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { BlogFeaturedPost } from "@/components/blog/blog-featured-post";
 import { BlogRecentPosts } from "@/components/blog/blog-recent-posts";
-import { BlogStickerHero } from "@/components/blog/blog-sticker-hero";
 import enter from "@/components/blog/blog-enter.module.css";
 import { JsonLd } from "@/components/seo/json-ld";
 import { getAllPosts } from "@/lib/blog/data";
 import { blogPageJsonLd } from "@/lib/seo";
 import { siteName } from "@/lib/site";
 
+const FEATURED_CAROUSEL_COUNT = 4;
 const RECENT_POSTS_COUNT = 3;
 
 export const metadata: Metadata = {
@@ -35,24 +35,27 @@ export const metadata: Metadata = {
 };
 
 export default function BlogLandingPage() {
-  const [featured, ...rest] = getAllPosts();
-  const recentPosts = rest.slice(0, RECENT_POSTS_COUNT);
+  const allPosts = getAllPosts();
+  const featuredPosts = allPosts.slice(0, FEATURED_CAROUSEL_COUNT);
+  const featuredSlugs = new Set(featuredPosts.map((post) => post.slug));
+  const recentPosts = allPosts
+    .filter((post) => !featuredSlugs.has(post.slug))
+    .slice(0, RECENT_POSTS_COUNT);
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto w-full max-w-[1100px]">
       <JsonLd data={blogPageJsonLd()} />
 
-      <BlogStickerHero nowWritingTitle={featured?.title} />
-
-      {featured ? (
-        <BlogFeaturedPost post={featured} />
+      {featuredPosts.length > 0 ? (
+        <BlogFeaturedPost posts={featuredPosts} />
       ) : (
         <p
           className={`rounded-xl border border-dashed border-zinc-300 px-4 py-16 text-center text-zinc-500 dark:border-zinc-700 dark:text-zinc-400 ${enter.enter}`}
-          style={{ animationDelay: "0.22s" }}
+          style={{ animationDelay: "0.12s" }}
         >
           아직 게시된 글이 없습니다.
-        </p>      )}
+        </p>
+      )}
 
       <BlogRecentPosts posts={recentPosts} />
     </div>
