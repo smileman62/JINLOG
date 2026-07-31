@@ -1,8 +1,8 @@
 ---
 title: "에러 핸들링 & 안정성 - 프론트엔드 에러 처리"
-description: "프론트엔드에서도 에러처리가 필요하다 서비스를 운영하기 위해 백엔드의 지원은 필수적이지만, 만일 백엔드 서버가 아프거나, 네트워크 상황이 좋지 않아 제대로 통신이 이루어지지 않았을 때, 에러처리가 필요하다. 만일 단순한 API를 요청이 실패하여 에러가 발생했을 경우, 그 에러로 인해 서…"
+description: "프론트엔드에서도 에러처리가 필요하다 서비스를 운영하기 위해 백엔드의 지원은 필수적이지만, 만일 백엔드 서버가 아프거나, 네트워크 상황이 좋지 않아 제대로 통신이 이루어지지 않았을 때, 에러처리가 필요하다. 만일 단순한 API를 요청이 실패하여 에…"
 date: "2026-05-04"
-tags: ["nextjs", "react"]
+tags: ["react"]
 published: true
 ---
 프론트엔드에서도 에러처리가 필요하다
@@ -18,57 +18,56 @@ published: true
 에러처리를 하기에 앞서 어떤 상황에서 에러가 발생하는지에 대해서 먼저 알아보고 싶었다.
 
 **다양한 에러 상황 요약 :**
+> - 데이터에서 시작되는 에러
+> - 네트워크와 API에서 발생하는 에러
+> - 사용자 행동에서 발생하는 에러
+> - 비동기 처리에서 발생하는 에러
+> - 렌더링 과정에서 발생하는 에러
+> - 전역 상태와 환경에서 발생하는 에러
+> - 외부 라이브러리에서 발생하는 에러
+> - 브라우저와 환경 차이에서 발생하는 에러
+> - 성능 문제에서 시작되는 에러
 
-> \- 데이터에서 시작되는 에러  
-> \- 네트워크와 API에서 발생하는 에러  
-> \- 사용자 행동에서 발생하는 에러  
-> \- 비동기 처리에서 발생하는 에러  
-> \- 렌더링 과정에서 발생하는 에러  
-> \- 전역 상태와 환경에서 발생하는 에러  
-> \- 외부 라이브러리에서 발생하는 에러  
-> \- 브라우저와 환경 차이에서 발생하는 에러  
-> \- 성능 문제에서 시작되는 에러
-
-#### **데이터가 아직 없을 때 발생하는 에**
+#### **데이터가 아직 없을 때 발생하는 에러**
 
 프론트엔드에서 가장 흔한 에러는 데이터와 관련되어 있다.
 
-특히 API 기반으로 동작하는 서비스에서는 데이터가 항상 “정상적일 것”이라는 가정 자체가 위험하다.
+특히 API 기반으로 동작하는 서비스에서는 데이터가 항상 "정상적일 것"이라는 가정 자체가 위험하다.
 
 예를 들어 다음과 같은 코드는 매우 흔하다.
 
-```
+```jsx
 function UserProfile({ user }) {
-  return {user.name};
+  return <div>{user.name}</div>;
 }
 ```
 
-하지만 초기 렌더링 시점에 user가 아직 존재하지 않는다면, 이 코드는 즉시 에러를 발생시킨다.  
+하지만 초기 렌더링 시점에 user가 아직 존재하지 않는다면, 이 코드는 즉시 에러를 발생시킨다.
 또한 API 응답 구조가 예상과 다르게 변경되는 경우에도 문제가 발생한다.
 
-```
+```js
 data.items.map(...)
 ```
 
-이때 실제 응답이 \{ products: \[\] \}라면, items가 존재하지 않아 런타임 에러가 발생한다.
+이때 실제 응답이 \{ products: [] \}라면, items가 존재하지 않아 런타임 에러가 발생한다.
 
-이러한 문제는 단순한 실수가 아니라, 프론트엔드가 “비동기 데이터” 위에서 동작한다는 특성에서 비롯된다.
+이러한 문제는 단순한 실수가 아니라, 프론트엔드가 "비동기 데이터" 위에서 동작한다는 특성에서 비롯된다.
 
 따라서 데이터 접근은 항상 방어적으로 작성해야 한다.
 
 **안전한 코드**
 
-```
+```jsx
 function UserProfile({ user }) {
-  if (!user) return 로딩 중...;
-  return {user.name};
+  if (!user) return <p>로딩 중...</p>;
+  return <div>{user.name}</div>;
 }
 ```
 
 또는
 
-```
-{user?.name ?? '이름 없음'}
+```jsx
+<div>{user?.name ?? '이름 없음'}</div>
 ```
 
 #### **네트워크와 API에서 발생하는 에러**
@@ -81,7 +80,7 @@ function UserProfile({ user }) {
 
 예를 들어 단순한 API 호출 코드가 있다고 가정해보자.
 
-```
+```js
 const fetchUser = async () => {
   const res = await fetch('/api/user');
   return res.json();
@@ -90,13 +89,13 @@ const fetchUser = async () => {
 
 이 코드는 겉보기에는 문제가 없어 보이지만, 실제로는 다음과 같은 상황에서 실패할 수 있다.
 
--   서버가 500 에러를 반환하는 경우
--   네트워크가 끊긴 경우
--   응답이 JSON이 아닌 경우
+- 서버가 500 에러를 반환하는 경우
+- 네트워크가 끊긴 경우
+- 응답이 JSON이 아닌 경우
 
 이때 아무런 처리를 하지 않으면 에러는 그대로 UI까지 전파된다.
 
-```
+```js
 useEffect(() => {
   fetchUser(); // 실패해도 아무 처리 없음
 }, []);
@@ -104,7 +103,7 @@ useEffect(() => {
 
 안전하게 처리하려면 반드시 실패를 고려해야 한다.
 
-```
+```js
 useEffect(() => {
   const load = async () => {
     try {
@@ -121,7 +120,7 @@ useEffect(() => {
 
 또 하나 중요한 문제는 요청이 겹치는 상황이다.
 
-```
+```js
 useEffect(() => {
   fetch(`/api/user/${id}`).then(res => res.json()).then(setUser);
 }, [id]);
@@ -137,25 +136,25 @@ useEffect(() => {
 
 예를 들어 버튼을 여러 번 클릭하는 상황을 보자.
 
-```
+```jsx
 function OrderButton() {
   const handleOrder = async () => {
     await api.post('/order');
   };
 
-  return 주문하기;
+  return <button onClick={handleOrder}>주문하기</button>;
 }
 ```
 
 이 경우 사용자가 버튼을 여러 번 누르면 요청이 중복으로 발생한다.
 
--   서버에 동일 데이터 여러 번 생성
--   상태 꼬임
--   결제 중복 같은 심각한 문제 발생 가능
+- 서버에 동일 데이터 여러 번 생성
+- 상태 꼬임
+- 결제 중복 같은 심각한 문제 발생 가능
 
 이를 방지하려면 로딩 상태로 제어해야 한다.
 
-```
+```jsx
 function OrderButton() {
   const [loading, setLoading] = useState(false);
 
@@ -171,9 +170,9 @@ function OrderButton() {
   };
 
   return (
-    
+    <button onClick={handleOrder} disabled={loading}>
       {loading ? '처리 중...' : '주문하기'}
-    
+    </button>
   );
 }
 ```
@@ -188,7 +187,7 @@ JavaScript의 비동기 특성 역시 많은 문제를 만든다.
 
 특히 Promise를 제대로 처리하지 않거나, 에러를 catch하지 않는 경우 문제가 발생한다.
 
-```
+```js
 useEffect(() => {
   fetchData(); // 에러 처리 없음
 }, []);
@@ -198,7 +197,7 @@ useEffect(() => {
 
 또한 컴포넌트가 unmount된 이후 상태를 업데이트하는 문제도 자주 발생한다.
 
-```
+```js
 useEffect(() => {
   fetchData().then(data => setState(data));
 }, []);
@@ -206,13 +205,13 @@ useEffect(() => {
 
 사용자가 페이지를 빠르게 이동하면 다음과 같은 상황이 발생한다.
 
--   컴포넌트는 이미 사라짐
--   하지만 비동기 요청은 완료됨
--   setState 실행 → 경고 발생
+- 컴포넌트는 이미 사라짐
+- 하지만 비동기 요청은 완료됨
+- setState 실행 → 경고 발생
 
 이를 방지하려면 마운트 상태를 체크해야 한다.
 
-```
+```js
 useEffect(() => {
   let isMounted = true;
 
@@ -228,7 +227,7 @@ useEffect(() => {
 }, []);
 ```
 
-이러한 문제는 특정 타이밍에서만 발생하기 때문에 “숨은 에러”가 되기 쉽다.
+이러한 문제는 특정 타이밍에서만 발생하기 때문에 "숨은 에러"가 되기 쉽다.
 
 #### **렌더링 과정에서 발생하는 에러**
 
@@ -238,9 +237,9 @@ useEffect(() => {
 
 대표적인 예시는 다음과 같다.
 
-```
+```jsx
 {data.map(item => (
-  {item.name}
+  <div key={item.id}>{item.name}</div>
 ))}
 ```
 
@@ -248,24 +247,24 @@ useEffect(() => {
 
 또는 더 위험한 경우도 있다.
 
-```
+```jsx
 function Profile({ user }) {
-  return {user.name.toUpperCase()};
+  return <div>{user.name.toUpperCase()}</div>;
 }
 ```
 
--   user = null
--   user.name = undefined
+- user = null
+- user.name = undefined
 
 렌더링 중 즉시 crash가 발생한다.
 
 이를 방지하려면 반드시 방어적으로 작성해야 한다.
 
-```
+```jsx
 function Profile({ user }) {
-  if (!user?.name) return 데이터 없음;
+  if (!user?.name) return <p>데이터 없음</p>;
 
-  return {user.name.toUpperCase()};
+  return <div>{user.name.toUpperCase()}</div>;
 }
 ```
 
@@ -277,7 +276,7 @@ function Profile({ user }) {
 
 대표적인 예시는 localStorage 파싱이다.
 
-```
+```js
 const user = JSON.parse(localStorage.getItem('user'));
 ```
 
@@ -285,7 +284,7 @@ const user = JSON.parse(localStorage.getItem('user'));
 
 이를 방지하려면 try-catch가 필요하다.
 
-```
+```js
 function getUser() {
   try {
     const value = localStorage.getItem('user');
@@ -298,12 +297,12 @@ function getUser() {
 
 또한 Next.js에서는 hydration mismatch 문제도 자주 발생한다.
 
-```
+```jsx
 // 서버
-{new Date().toLocaleTimeString()}
+<p>{new Date().toLocaleTimeString()}</p>
 
 // 클라이언트
-다른 시간
+<p>다른 시간</p>
 ```
 
 서버와 클라이언트 결과 불일치 → 경고 및 UI 문제 발생
@@ -314,31 +313,31 @@ function getUser() {
 
 차트, 지도, 에디터 같은 외부 라이브러리는 내부 동작을 알기 어렵기 때문에 더 위험하다.
 
-```
-
+```jsx
+<Chart data={data} />
 ```
 
 data 형식이 조금만 달라도 내부에서 에러가 발생할 수 있고, 이 에러는 렌더링 단계에서 발생하기 때문에 전체 UI에 영향을 준다.
 
 이를 방지하려면 반드시 Error Boundary로 감싸야 한다.
 
-```
-차트를 불러올 수 없습니다.}>
-  
-
+```jsx
+<ErrorBoundary fallback={<p>차트를 불러올 수 없습니다.</p>}>
+  <Chart data={data} />
+</ErrorBoundary>
 ```
 
 #### **브라우저와 환경 차이에서 발생하는 에러**
 
 프론트엔드는 다양한 환경에서 실행되기 때문에 동일한 코드라도 다른 결과가 나올 수 있다.
 
-```
+```js
 window.localStorage
 ```
 
 이 코드는 브라우저에서는 정상 동작하지만, 서버 환경에서는 에러가 발생한다.
 
-```
+```js
 if (typeof window !== 'undefined') {
   localStorage.getItem('user');
 }
@@ -346,7 +345,7 @@ if (typeof window !== 'undefined') {
 
 또한 특정 API는 일부 브라우저에서 지원되지 않는다.
 
-```
+```js
 navigator.clipboard.writeText('text');
 ```
 
@@ -356,13 +355,13 @@ navigator.clipboard.writeText('text');
 
 #### **성능 문제에서 시작되는 에러**
 
-에러는 반드시 Exception 형태로만 나타나지 않는다. 성능 문제 역시 사용자 입장에서는 “서비스가 고장난 것처럼” 보인다.
+에러는 반드시 Exception 형태로만 나타나지 않는다. 성능 문제 역시 사용자 입장에서는 "서비스가 고장난 것처럼" 보인다.
 
 예를 들어 대량 데이터를 한 번에 렌더링하는 경우다.
 
-```
+```jsx
 {
-  items.map(item => );
+  items.map(item => <Item key={item.id} {...item} />);
 }
 ```
 
@@ -370,7 +369,7 @@ items가 1000개라면 화면이 멈출 수 있다.
 
 또한 메모리 누수도 문제를 만든다.
 
-```
+```js
 useEffect(() => {
   const id = setInterval(() => {
     console.log('running');
@@ -384,7 +383,7 @@ useEffect(() => {
 
 이를 해결하려면 cleanup이 필요하다.
 
-```
+```js
 useEffect(() => {
   const id = setInterval(() => {
     console.log('running');
@@ -394,13 +393,13 @@ useEffect(() => {
 }, []);
 ```
 
-이러한 문제는 코드가 틀리지 않았더라도 충분히 “에러 상황”으로 이어진다.
+이러한 문제는 코드가 틀리지 않았더라도 충분히 "에러 상황"으로 이어진다.
 
 생각보다 많은 에러 상황이 존재한다.
 
-* * *
+---
 
-## Error Boundary - 에러를 막는 것이 아니라 ‘격리’하는 것
+## Error Boundary - 에러를 막는 것이 아니라 '격리'하는 것
 
 단순한 코드 한 줄에서 에러가 발생했을 뿐인데, 화면 전체가 하얗게 변하면서 아무것도 보이지 않는 상황이다.
 
@@ -412,67 +411,65 @@ React에서는 렌더링 중 에러가 발생하면 해당 컴포넌트 트리�
 
 Error Boundary는 **하위 컴포넌트에서 발생한 렌더링 에러를 잡아서, 대체 UI(fallback UI)를 보여주는 컴포넌트**다.
 
-쉽게 말하면, 에러가 발생했을 때 앱이 죽지 않도록 “보호막” 역할을 한다.
+쉽게 말하면, 에러가 발생했을 때 앱이 죽지 않도록 "보호막" 역할을 한다.
 
 예를 들어 아래와 같은 코드가 있다고 가정해보자.
 
-```
+```jsx
 function Profile({ user }) {
-  return {user.name.toUpperCase()};
+  return <div>{user.name.toUpperCase()}</div>;
 }
 ```
 
-만약 user가 null이라면 user.name에서 에러가 발생한다.  
+만약 user가 null이라면 user.name에서 에러가 발생한다.
 이때 Error Boundary가 없다면, 이 에러는 상위로 전파되면서 화면 전체가 깨질 수 있다.
 
 #### **Error Boundary가 해결하는 문제**
 
 Error Boundary의 핵심 역할은 하나다.
 
-**“에러를 막는 것이 아니라, 에러의 영향을 제한하는 것”**
+**"에러를 막는 것이 아니라, 에러의 영향을 제한하는 것"**
 
 즉, 문제가 발생한 컴포넌트만 격리하고 나머지 UI는 정상적으로 유지한다.
 
 예를 들어 대시보드 화면이 있다고 해보자.
 
+```jsx
+<Dashboard>
+  <Chart />
+  <UserInfo />
+  <Notifications />
+</Dashboard>
 ```
 
-  
-  
-  
-
-```
-
-여기서 Chart에서 에러가 발생했다고 해서 전체 페이지가 사라지는 것은 좋은 UX가 아니다.  
+여기서 Chart에서 에러가 발생했다고 해서 전체 페이지가 사라지는 것은 좋은 UX가 아니다.
 Error Boundary를 사용하면 다음과 같이 개선할 수 있다.
 
-```
+```jsx
+<Dashboard>
+  <ErrorBoundary fallback={<p>차트를 불러올 수 없습니다.</p>}>
+    <Chart />
+  </ErrorBoundary>
 
-  차트를 불러올 수 없습니다.}>
-    
-  
-
-  
-  
-
+  <UserInfo />
+  <Notifications />
+</Dashboard>
 ```
 
 이제 Chart가 깨지더라도 나머지 UI는 그대로 유지된다.
 
 #### **Error Boundary는 언제 동작하는가**
 
-Error Boundary는 모든 에러를 잡아주는 것이 아니다.  
+Error Boundary는 모든 에러를 잡아주는 것이 아니다.
 동작하는 범위를 정확히 이해하는 것이 중요하다.
 
 잡을 수 있는 에러
 
--   렌더링 과정에서 발생한 에러
--   라이프사이클 메서드 내부 에러
--   하위 컴포넌트에서 발생한 에러
+- 렌더링 과정에서 발생한 에러
+- 라이프사이클 메서드 내부 에러
+- 하위 컴포넌트에서 발생한 에러
 
-더보기
-
-### 라이프사이클이란 무엇인가
+##### 라이프사이클이란 무엇인가
 
 React에서 **라이프사이클(Lifecycle)**은 컴포넌트가 생성되고, 업데이트되고, 사라질 때까지의 전체 과정을 의미한다.
 
@@ -486,9 +483,9 @@ React에서 **라이프사이클(Lifecycle)**은 컴포넌트가 생성되고, �
 
 **라이프사이클 흐름을 코드로 이해하기**
 
-**1\. Mount (처음 화면에 등장할 때)**
+**1. Mount (처음 화면에 등장할 때)**
 
-```
+```js
 useEffect(() => {
   console.log('컴포넌트가 처음 렌더링됨');
 }, []);
@@ -496,11 +493,11 @@ useEffect(() => {
 
 → 컴포넌트가 처음 생성될 때 실행
 
-* * *
+---
 
-**2\. Update (값이 바뀔 때)**
+**2. Update (값이 바뀔 때)**
 
-```
+```js
 useEffect(() => {
   console.log('count가 변경됨');
 }, [count]);
@@ -508,11 +505,11 @@ useEffect(() => {
 
 → state나 props가 변경될 때 실행
 
-* * *
+---
 
-**3\. Unmount (컴포넌트가 사라질 때)**
+**3. Unmount (컴포넌트가 사라질 때)**
 
-```
+```js
 useEffect(() => {
   return () => {
     console.log('컴포넌트가 제거됨');
@@ -522,11 +519,11 @@ useEffect(() => {
 
 → 화면에서 사라질 때 실행
 
-**라이프사이클 “메서드”라는 표현은 왜 나올까?**
+**라이프사이클 "메서드"라는 표현은 왜 나올까?**
 
 이건 React의 **클래스 컴포넌트 시절 용어**다.
 
-```
+```jsx
 class MyComponent extends React.Component {
   componentDidMount() {
     console.log('마운트');
@@ -541,7 +538,7 @@ class MyComponent extends React.Component {
   }
 
   render() {
-    return Hello;
+    return <div>Hello</div>;
   }
 }
 ```
@@ -550,19 +547,17 @@ class MyComponent extends React.Component {
 
 지금은 함수형 컴포넌트 + useEffect로 대체되었지만, 개념은 동일하다.
 
-* * *
+---
 
-**그럼 “라이프사이클 메서드 내부 에러”는 무슨 뜻인가**
+**그럼 "라이프사이클 메서드 내부 에러"는 무슨 뜻인가**
 
 말 그대로 **이 lifecycle 흐름 중에 실행되는 코드에서 에러가 발생하는 경우**를 의미한다.
 
 예시로 보면 이해가 쉽다.
 
-* * *
-
 **예시 1: mount 시점 에러**
 
-```
+```js
 useEffect(() => {
   const data = JSON.parse(localStorage.getItem('user')); // 여기서 에러 가능
 }, []);
@@ -572,7 +567,7 @@ useEffect(() => {
 
 **예시 2: update 시점 에러**
 
-```
+```js
 useEffect(() => {
   console.log(user.name.toUpperCase());
 }, [user]);
@@ -582,14 +577,14 @@ useEffect(() => {
 
 **예시 3: 클래스 컴포넌트 기준**
 
-```
+```jsx
 class Test extends React.Component {
   componentDidMount() {
     throw new Error('에러 발생');
   }
 
   render() {
-    return Hello;
+    return <div>Hello</div>;
   }
 }
 ```
@@ -600,12 +595,12 @@ class Test extends React.Component {
 
 Error Boundary는 다음 에러를 잡는다.
 
--   render 중 에러
--   lifecycle 내부 에러
+- render 중 에러
+- lifecycle 내부 에러
 
 즉 이런 경우는 잡힌다.
 
-```
+```js
 useEffect(() => {
   throw new Error('에러');
 }, []);
@@ -613,23 +608,23 @@ useEffect(() => {
 
 하지만 이런 건 못 잡는다.
 
-```
+```js
 const handleClick = () => {
   throw new Error('에러');
 };
 ```
 
-→ 이벤트 핸들러는 lifecycle이 아니라 “사용자 액션”이기 때문
+→ 이벤트 핸들러는 lifecycle이 아니라 "사용자 액션"이기 때문
 
 잡지 못하는 에러
 
--   이벤트 핸들러 에러 (onClick 등)
--   비동기 코드 (setTimeout, Promise)
--   서버 사이드 렌더링 에러
+- 이벤트 핸들러 에러 (onClick 등)
+- 비동기 코드 (setTimeout, Promise)
+- 서버 사이드 렌더링 에러
 
 예를 들어 다음 코드는 Error Boundary가 잡지 못한다.
 
-```
+```js
 const handleClick = () => {
   throw new Error('에러 발생');
 };
@@ -637,13 +632,13 @@ const handleClick = () => {
 
 이 경우에는 try-catch 또는 별도의 에러 처리 로직이 필요하다.
 
-* * *
+---
 
 ### Error Boundary 직접 구현하기
 
 Error Boundary는 클래스 컴포넌트로만 구현할 수 있다.
 
-```
+```tsx
 import { Component, ReactNode } from 'react';
 
 interface Props {
@@ -655,7 +650,7 @@ interface State {
   hasError: boolean;
 }
 
-export class ErrorBoundary extends Component {
+export class ErrorBoundary extends Component<Props, State> {
   state: State = {
     hasError: false,
   };
@@ -682,38 +677,38 @@ export class ErrorBoundary extends Component {
 
 #### 실제 사용 예시
 
-```
+```jsx
 function App() {
   return (
-    
-      대시보드
+    <div>
+      <h1>대시보드</h1>
 
-      차트를 불러올 수 없습니다.}>
-        
-      
+      <ErrorBoundary fallback={<p>차트를 불러올 수 없습니다.</p>}>
+        <Chart />
+      </ErrorBoundary>
 
-      유저 정보를 불러올 수 없습니다.}>
-        
-      
-    
+      <ErrorBoundary fallback={<p>유저 정보를 불러올 수 없습니다.</p>}>
+        <UserInfo />
+      </ErrorBoundary>
+    </div>
   );
 }
 ```
 
 이렇게 기능 단위로 Error Boundary를 나누면, 특정 기능이 깨져도 전체 앱은 안정적으로 유지된다.
 
-* * *
+---
 
 ### Error Boundary 설계 전략
 
-Error Boundary는 “어디에 두느냐”가 중요하다.
+Error Boundary는 "어디에 두느냐"가 중요하다.
 
 #### 너무 크게 감싸는 경우
 
-```
-
-  
-
+```jsx
+<ErrorBoundary>
+  <App />
+</ErrorBoundary>
 ```
 
 → 하나의 에러로 전체 앱이 fallback으로 대체됨
@@ -724,36 +719,36 @@ Error Boundary는 “어디에 두느냐”가 중요하다.
 
 #### 추천 방식
 
--   페이지 단위: 전체 보호
--   기능 단위: 주요 UI 보호
--   외부 라이브러리: 반드시 분리
+- 페이지 단위: 전체 보호
+- 기능 단위: 주요 UI 보호
+- 외부 라이브러리: 반드시 분리
 
+```jsx
+<Page>
+  <Header />
+
+  <ErrorBoundary fallback={<ErrorUI />}>
+    <Chart />
+  </ErrorBoundary>
+
+  <ErrorBoundary fallback={<ErrorUI />}>
+    <Map />
+  </ErrorBoundary>
+</Page>
 ```
 
-  
-
-  }>
-    
-  
-
-  }>
-    
-  
-
-```
-
-* * *
+---
 
 ### 선언적 에러 처리 vs 명령적 에러 처리
 
 **선언적 에러 처리 (Declarative)**
 
-선언적 에러 처리는 **상태 기반으로 UI를 분기하는 방식**이다.  
-즉, “지금 상태가 어떤가”에 따라 보여줄 UI를 결정한다.
+선언적 에러 처리는 **상태 기반으로 UI를 분기하는 방식**이다.
+즉, "지금 상태가 어떤가"에 따라 보여줄 UI를 결정한다.
 
 예를 들어 React Query를 사용한 코드다.
 
-```
+```jsx
 function UserProfile() {
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['user'],
@@ -761,27 +756,27 @@ function UserProfile() {
   });
 
   if (isLoading) {
-    return 로딩 중...;
+    return <p>로딩 중...</p>;
   }
 
   if (isError) {
     return (
-      
-        {error.message}
-        다시 시도
-      
+      <div>
+        <p>{error.message}</p>
+        <button onClick={refetch}>다시 시도</button>
+      </div>
     );
   }
 
-  return {data.name};
+  return <div>{data.name}</div>;
 }
 ```
 
 이 코드의 특징은
 
--   상태(isLoading, isError)에 따라 UI가 자동으로 결정된다
--   흐름이 눈에 보인다
--   유지보수가 쉽다
+- 상태(isLoading, isError)에 따라 UI가 자동으로 결정된다
+- 흐름이 눈에 보인다
+- 유지보수가 쉽다
 
 이 방식은 특히 **데이터 조회 UI**에서 강력하다.
 
@@ -791,7 +786,7 @@ function UserProfile() {
 
 대표적으로 try-catch가 있다.
 
-```
+```jsx
 function LoginButton() {
   const handleLogin = async () => {
     try {
@@ -806,15 +801,15 @@ function LoginButton() {
     }
   };
 
-  return 로그인;
+  return <button onClick={handleLogin}>로그인</button>;
 }
 ```
 
 이 방식은 다음과 같은 특징이 있다.
 
--   사용자의 행동에 즉각 반응
--   흐름 제어가 명확
--   사이드 이펙트 처리에 유리
+- 사용자의 행동에 즉각 반응
+- 흐름 제어가 명확
+- 사이드 이펙트 처리에 유리
 
 즉, **버튼 클릭, 폼 제출 같은 사용자 액션**에 적합하다.
 
@@ -822,12 +817,12 @@ function LoginButton() {
 
 실제 서비스에서는 둘 중 하나만 쓰지 않는다.
 
-```
+```jsx
 function Page() {
   const { data, isError } = useQuery(...);
 
   // 선언적 처리
-  if (isError) return ;
+  if (isError) return <ErrorUI />;
 
   // 명령적 처리
   const handleSubmit = async () => {
@@ -838,7 +833,7 @@ function Page() {
     }
   };
 
-  return 제출;
+  return <button onClick={handleSubmit}>제출</button>;
 }
 ```
 
@@ -849,9 +844,9 @@ function Page() {
 사용자 액션 → 명령적 처리
 ```
 
-#### API 에러는 ‘분류’부터 시작해야 한다
+#### API 에러는 '분류'부터 시작해야 한다
 
-에러 처리가 어려운 이유는 대부분 “모든 에러를 동일하게 처리하려 하기 때문”이다.
+에러 처리가 어려운 이유는 대부분 "모든 에러를 동일하게 처리하려 하기 때문"이다.
 
 안정적인 설계를 위해서는 먼저 에러를 예측 가능한 에러와 예측 불가능한 에러로 나누어야 한다.
 
@@ -861,7 +856,7 @@ function Page() {
 
 **예시 코드:**
 
-```
+```js
 const login = async () => {
   try {
     await api.post('/login');
@@ -879,15 +874,15 @@ const login = async () => {
 
 이런 경우에는 Error Boundary를 통해 UI를 격리하고, fallback UI를 보여주는 것이 핵심이다.
 
-이렇게 에러를 분리하면 “어떤 에러는 사용자에게 안내하고, 어떤 에러는 시스템적으로 보호한다”는 명확한 전략을 세울 수 있다.
+이렇게 에러를 분리하면 "어떤 에러는 사용자에게 안내하고, 어떤 에러는 시스템적으로 보호한다"는 명확한 전략을 세울 수 있다.
 
-* * *
+---
 
 ## Fallback UI - 단순한 에러 화면이 아니라 UX 전략
 
 Fallback UI는 에러 상황에서 사용자에게 무엇을 보여줄지를 결정하는 요소다.
 
-단순히 “에러가 발생했습니다”라는 메시지를 보여주는 것만으로는 충분하지 않다.
+단순히 "에러가 발생했습니다"라는 메시지를 보여주는 것만으로는 충분하지 않다.
 
 좋은 Fallback UI는 현재 상황을 이해할 수 있게 하고, 다음 행동을 유도해야 한다.
 
@@ -895,66 +890,66 @@ Fallback UI는 에러 상황에서 사용자에게 무엇을 보여줄지를 결
 
 반면 특정 기능에서만 문제가 발생했다면 해당 영역만 대체 UI로 바꾸고 나머지는 그대로 유지해야 한다.
 
-또한 데이터가 없는 상태는 에러가 아니라 정상 상태이기 때문에, “데이터 없음”에 대한 별도의 UI를 설계해야 한다.
+또한 데이터가 없는 상태는 에러가 아니라 정상 상태이기 때문에, "데이터 없음"에 대한 별도의 UI를 설계해야 한다.
 
 여기에 재시도 버튼이나 자동 재요청 전략을 함께 고려하면 사용자 경험이 크게 개선된다.
 
 결국 Fallback UI는 단순한 예외 처리가 아니라, 서비스의 완성도를 결정짓는 중요한 UX 요소다.
 
-**1\. 전체 페이지 에러**
+**1. 전체 페이지 에러**
 
-```
+```jsx
 function GlobalError() {
   return (
-    
-      문제가 발생했습니다
-       window.location.reload()}>
+    <div>
+      <h2>문제가 발생했습니다</h2>
+      <button onClick={() => window.location.reload()}>
         다시 시도
-      
-    
+      </button>
+    </div>
   );
 }
 ```
 
-**2\. 부분 UI 에러**
+**2. 부분 UI 에러**
 
-```
+```jsx
 if (isError) {
   return (
-    
-      차트를 불러올 수 없습니다.
-      다시 시도
-    
+    <div>
+      <p>차트를 불러올 수 없습니다.</p>
+      <button onClick={refetch}>다시 시도</button>
+    </div>
   );
 }
 ```
 
 → 특정 기능만 교체
 
-**3\. Empty State (에러 아님)**
+**3. Empty State (에러 아님)**
 
-```
+```jsx
 if (data.length === 0) {
   return (
-    
-      데이터가 없습니다
-      추가하기
-    
+    <div>
+      <p>데이터가 없습니다</p>
+      <button>추가하기</button>
+    </div>
   );
 }
 ```
 
 → 정상 상태
 
-**4\. 재시도 전략**
+**4. 재시도 전략**
 
-```
-다시 시도
+```jsx
+<button onClick={refetch}>다시 시도</button>
 ```
 
 또는 React Query
 
-```
+```jsx
 useQuery({
   queryKey: ['data'],
   queryFn: fetchData,
@@ -962,7 +957,7 @@ useQuery({
 });
 ```
 
-* * *
+---
 
 ## 안정적인 에러 처리 구조는 어떻게 만들어지는가
 
@@ -976,30 +971,50 @@ UI 레벨에서는 상태 기반으로 화면을 분기하고, 마지막으로 E
 
 이 모든 구조 위에서 Fallback UI가 사용자 경험을 책임진다.
 
-**1\. API 레벨**
+**1. API 레벨**
 
-```
+```js
 api.interceptors.response.use(
   res => res,
   error => {
     return Promise.reject({
-      type: error.response?.status ;
+      type: error.response?.status < 500 ? 'EXPECTED' : 'UNEXPECTED',
+      message: error.message,
+    });
+  }
+);
 ```
 
-**4\. 렌더링 보호**
+**2. 로직 레벨**
 
+```js
+try {
+  await api.post('/submit');
+} catch {
+  alert('실패');
+}
 ```
-}>
-  
 
+**3. UI 레벨**
+
+```jsx
+if (isError) return <ErrorUI />;
 ```
 
-* * *
+**4. 렌더링 보호**
+
+```jsx
+<ErrorBoundary fallback={<ErrorPage />}>
+  <App />
+</ErrorBoundary>
+```
+
+---
 
 ## 마무리
 
-에러 핸들링은 단순히 “에러를 처리하는 코드”가 아니라, 서비스의 안정성과 사용자 경험을 동시에 설계하는 영역이다.
+에러 핸들링은 단순히 "에러를 처리하는 코드"가 아니라, 서비스의 안정성과 사용자 경험을 동시에 설계하는 영역이다.
 
-Error Boundary를 통해 시스템을 보호하고, 선언적·명령적 처리를 상황에 맞게 사용하며, API 에러를 명확하게 분류하고, Fallback UI를 전략적으로 설계하는 것. 이 네 가지가 결합될 때 비로소 “깨지지 않는 프론트엔드”가 만들어진다.
+Error Boundary를 통해 시스템을 보호하고, 선언적·명령적 처리를 상황에 맞게 사용하며, API 에러를 명확하게 분류하고, Fallback UI를 전략적으로 설계하는 것. 이 네 가지가 결합될 때 비로소 "깨지지 않는 프론트엔드"가 만들어진다.
 
 감사합니다!

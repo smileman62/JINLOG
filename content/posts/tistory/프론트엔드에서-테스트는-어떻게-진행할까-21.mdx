@@ -1,6 +1,6 @@
 ---
 title: "프론트엔드에서 테스트는 어떻게 진행할까?"
-description: "프론트엔드 테스트는 왜 필요할까?버튼 하나의 조건을 바꿨는데 모달이 열리지 않을 수 있고, API 응답 구조가 조금 바뀌었는데 리스트가 렌더링되지 않을 수 있습니다. 또는 로그인 여부에 따라 보여야 할 페이지가 잘못 노출될 수도 있습니다.특히 React 프로젝트에서는 컴포넌트가 많아질…"
+description: "프론트엔드 테스트는 왜 필요할까? 버튼 하나의 조건을 바꿨는데 모달이 열리지 않을 수 있고, API 응답 구조가 조금 바뀌었는데 리스트가 렌더링되지 않을 수 있습니다. 또는 로그인 여부에 따라 보여야 할 페이지가 잘못 노출될 수도 있습니다. 특히…"
 date: "2026-05-24"
 tags: ["react"]
 published: true
@@ -24,7 +24,7 @@ API 응답이 도착한다.
 
 이 흐름이 테스트로 작성되어 있다면, 이후 코드를 리팩토링하더라도 검색 기능이 깨졌는지 빠르게 확인할 수 있습니다.
 
-* * *
+---
 
 ## 프론트엔드 테스트의 기본 관점
 
@@ -34,47 +34,30 @@ API 응답이 도착한다.
 
 대신 사용자가 실제로 보는 화면을 기준으로 확인하는 것이 좋습니다.
 
-```
+```js
 expect(screen.getByText('로그인 정보를 입력해주세요')).toBeInTheDocument();
 ```
 
-이 방식은 “모달 상태가 true인가?”를 확인하는 것이 아니라, “사용자 화면에 로그인 안내 문구가 보이는가?”를 확인합니다.
+이 방식은 "모달 상태가 true인가?"를 확인하는 것이 아니라, "사용자 화면에 로그인 안내 문구가 보이는가?"를 확인합니다.
 
 이 차이가 중요합니다. 내부 구현은 언제든 바뀔 수 있지만, 사용자에게 보여야 하는 결과는 유지되어야 하기 때문입니다.
 
-* * *
+---
 
 ## 프론트엔드 테스트의 종류
 
 프론트엔드 테스트는 보통 다음과 같이 나눌 수 있습니다.
 
-단위 테스트
-
-함수, 유틸 로직
-
-날짜 포맷, 가격 계산, 배열 필터링
-
-컴포넌트 테스트
-
-개별 UI 컴포넌트
-
-Button, Modal, Input, Card
-
-통합 테스트
-
-여러 컴포넌트와 상태의 연결
-
-검색 폼 + API + 결과 리스트
-
-E2E 테스트
-
-실제 브라우저에서 전체 사용자 흐름
-
-로그인 → 상품 검색 → 결제
+| 종류 | 대상 | 예시 |
+|---|---|---|
+| 단위 테스트 | 함수, 유틸 로직 | 날짜 포맷, 가격 계산, 배열 필터링 |
+| 컴포넌트 테스트 | 개별 UI 컴포넌트 | Button, Modal, Input, Card |
+| 통합 테스트 | 여러 컴포넌트와 상태의 연결 | 검색 폼 + API + 결과 리스트 |
+| E2E 테스트 | 실제 브라우저에서 전체 사용자 흐름 | 로그인 → 상품 검색 → 결제 |
 
 각 테스트는 역할이 다릅니다. 모든 것을 하나의 방식으로 테스트하려고 하면 오히려 비효율적입니다.
 
-* * *
+---
 
 ## 단위 테스트
 
@@ -82,7 +65,7 @@ E2E 테스트
 
 예를 들어 날짜를 화면에 보여주기 좋은 형식으로 바꾸는 함수가 있다고 해보겠습니다.
 
-```
+```ts
 export const formatDate = (date: string) => {
   return date.replaceAll('-', '.');
 };
@@ -90,7 +73,7 @@ export const formatDate = (date: string) => {
 
 이 함수는 다음과 같이 테스트할 수 있습니다.
 
-```
+```ts
 import { describe, expect, it } from 'vitest';
 import { formatDate } from './formatDate';
 
@@ -103,7 +86,7 @@ describe('formatDate', () => {
 
 단위 테스트는 실행 속도가 빠르고, 실패했을 때 원인을 찾기 쉽습니다. 그래서 날짜 변환, 숫자 계산, 필터링, 정렬, 유효성 검사 같은 로직에 적합합니다.
 
-* * *
+---
 
 ## 컴포넌트 테스트
 
@@ -111,7 +94,7 @@ describe('formatDate', () => {
 
 예를 들어 버튼 컴포넌트가 있다고 해보겠습니다.
 
-```
+```tsx
 type ButtonProps = {
   children: React.ReactNode;
   disabled?: boolean;
@@ -120,16 +103,16 @@ type ButtonProps = {
 
 export function Button({ children, disabled, onClick }: ButtonProps) {
   return (
-    
+    <button disabled={disabled} onClick={onClick}>
       {children}
-    
+    </button>
   );
 }
 ```
 
 이 컴포넌트는 다음과 같이 테스트할 수 있습니다.
 
-```
+```tsx
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -137,7 +120,7 @@ import { Button } from './Button';
 
 describe('Button', () => {
   it('버튼 텍스트를 렌더링한다', () => {
-    render(저장);
+    render(<Button>저장</Button>);
 
     expect(screen.getByRole('button', { name: '저장' })).toBeInTheDocument();
   });
@@ -146,7 +129,7 @@ describe('Button', () => {
     const user = userEvent.setup();
     const handleClick = vi.fn();
 
-    render(저장);
+    render(<Button onClick={handleClick}>저장</Button>);
 
     await user.click(screen.getByRole('button', { name: '저장' }));
 
@@ -159,7 +142,7 @@ describe('Button', () => {
 
 이 방식은 접근성 측면에서도 좋습니다. 테스트하기 쉬운 컴포넌트는 대체로 사용자와 스크린 리더도 접근하기 쉬운 구조를 갖는 경우가 많습니다.
 
-* * *
+---
 
 ## 통합 테스트
 
@@ -169,11 +152,11 @@ describe('Button', () => {
 
 통합 테스트는 이런 식으로 진행됩니다.
 
-```
+```ts
 it('검색어를 입력하고 검색하면 결과 목록이 표시된다', async () => {
   const user = userEvent.setup();
 
-  render();
+  render(<AnimeSearchPage />);
 
   await user.type(screen.getByPlaceholderText('애니메이션 검색'), 'naruto');
   await user.click(screen.getByRole('button', { name: '검색' }));
@@ -188,7 +171,7 @@ it('검색어를 입력하고 검색하면 결과 목록이 표시된다', async
 
 프론트엔드에서 실제로 가장 가치 있는 테스트는 이런 통합 테스트인 경우가 많습니다. 사용자가 경험하는 흐름을 직접 검증하기 때문입니다.
 
-* * *
+---
 
 ## API가 필요한 테스트는 어떻게 할까?
 
@@ -196,13 +179,13 @@ it('검색어를 입력하고 검색하면 결과 목록이 표시된다', async
 
 서버 상태나 네트워크 환경에 따라 테스트가 실패할 수 있고, 테스트 데이터가 바뀌면 결과도 흔들릴 수 있기 때문입니다. 그래서 API가 필요한 테스트에서는 보통 **Mocking**을 사용합니다.
 
-대표적으로 많이 사용하는 도구가 \*\*MSW(Mock Service Worker)\*\*입니다.
+대표적으로 많이 사용하는 도구가 **MSW(Mock Service Worker)**입니다.
 
 MSW는 프론트엔드 코드가 실제 API를 호출하는 것처럼 동작하게 두면서, 테스트 환경에서는 해당 요청을 가로채서 가짜 응답을 반환합니다.
 
 예를 들어 검색 API를 다음과 같이 모킹할 수 있습니다.
 
-```
+```ts
 import { http, HttpResponse } from 'msw';
 
 export const handlers = [
@@ -221,9 +204,9 @@ export const handlers = [
 
 그러면 테스트에서는 실제 서버가 없어도 API 응답을 받은 것처럼 화면을 검증할 수 있습니다.
 
-```
+```ts
 it('API 응답으로 받은 검색 결과를 렌더링한다', async () => {
-  render();
+  render(<AnimeSearchPage />);
 
   expect(await screen.findByText('Naruto')).toBeInTheDocument();
 });
@@ -231,7 +214,7 @@ it('API 응답으로 받은 검색 결과를 렌더링한다', async () => {
 
 MSW를 사용하면 성공 응답뿐 아니라 실패 응답도 테스트할 수 있습니다.
 
-```
+```ts
 http.get('/api/anime/search', () => {
   return HttpResponse.json(
     { message: '검색 결과를 불러오지 못했습니다.' },
@@ -242,13 +225,13 @@ http.get('/api/anime/search', () => {
 
 이런 식으로 에러 응답을 만들고, 화면에 에러 메시지가 제대로 표시되는지 확인할 수 있습니다.
 
-```
+```ts
 expect(
   await screen.findByText('검색 결과를 불러오지 못했습니다.')
 ).toBeInTheDocument();
 ```
 
-* * *
+---
 
 ## 로딩, 에러, 빈 상태도 테스트해야 한다
 
@@ -267,13 +250,13 @@ API 요청이 실패했을 때 에러 메시지가 보이는가?
 
 예를 들어 검색 결과가 없을 때는 다음과 같은 UI가 나올 수 있습니다.
 
-```
+```ts
 expect(await screen.findByText('검색 결과가 없습니다.')).toBeInTheDocument();
 ```
 
 이런 테스트는 서비스의 안정성을 높여줍니다. 사용자는 성공 케이스만 경험하지 않기 때문에, 예외 상황까지 테스트하는 것이 중요합니다.
 
-* * *
+---
 
 ## 테스트 커버리지는 어떻게 봐야 할까?
 
@@ -289,39 +272,19 @@ expect(await screen.findByText('검색 결과가 없습니다.')).toBeInTheDocum
 
 프로젝트에서는 보통 다음과 같은 우선순위로 테스트를 작성하는 것이 좋습니다.
 
-우선순위 테스트 대상
-
-높음
-
-로그인, 회원가입, 검색, 작성, 삭제 등 핵심 사용자 흐름
-
-높음
-
-API 성공, 실패, 빈 데이터 상태
-
-높음
-
-폼 유효성 검사
-
-높음
-
-권한에 따른 화면 분기
-
-중간
-
-공통 컴포넌트
-
-중간
-
-유틸 함수
-
-낮음
-
-단순 정적 UI
+| 우선순위 | 테스트 대상 |
+|---|---|
+| 높음 | 로그인, 회원가입, 검색, 작성, 삭제 등 핵심 사용자 흐름 |
+| 높음 | API 성공, 실패, 빈 데이터 상태 |
+| 높음 | 폼 유효성 검사 |
+| 높음 | 권한에 따른 화면 분기 |
+| 중간 | 공통 컴포넌트 |
+| 중간 | 유틸 함수 |
+| 낮음 | 단순 정적 UI |
 
 커버리지는 목표가 아니라 참고 지표로 보는 것이 좋습니다. 테스트의 목적은 숫자를 채우는 것이 아니라, 기능이 깨졌을 때 빠르게 알아차리는 것입니다.
 
-* * *
+---
 
 ## 프론트엔드 테스트 도구 조합
 
@@ -343,13 +306,13 @@ MSW는 API 응답을 안정적으로 제어할 수 있게 해주기 때문에, A
 
 Playwright나 Cypress는 실제 브라우저를 띄워서 로그인부터 페이지 이동까지 전체 흐름을 검증할 때 사용합니다.
 
-* * *
+---
 
 ## 테스트는 어디까지 작성해야 할까?
 
 모든 코드를 테스트하려고 하면 오히려 부담이 커집니다. 처음부터 완벽한 테스트 환경을 만들기보다는, 깨지면 치명적인 기능부터 테스트하는 것이 좋습니다.
 
-예를 들어 “인생 애니메이션 9선 선택 서비스”라면 다음 기능부터 테스트할 수 있습니다.
+예를 들어 "인생 애니메이션 9선 선택 서비스"라면 다음 기능부터 테스트할 수 있습니다.
 
 ```
 애니메이션을 검색할 수 있는가?
@@ -366,7 +329,7 @@ API 요청 실패 시 에러 메시지가 표시되는가?
 
 반면 단순히 제목만 출력하는 섹션이나 스타일만 담당하는 컴포넌트는 우선순위를 낮게 잡아도 됩니다.
 
-* * *
+---
 
 ## 정리
 

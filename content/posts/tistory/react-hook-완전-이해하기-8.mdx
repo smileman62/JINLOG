@@ -1,13 +1,11 @@
 ---
 title: "React Hook 완전 이해하기"
-description: "React Hook 완전 이해 - 단순한 함수가 아닌 React의 핵심 인터페이스React를 사용하다 보면 자연스럽게 useState, useEffect, useRef와 같은 Hook을 접하게 됩니다.대부분의 개발자는 Hook을 각각의 기능 단위 API로 이해하고 사용합니다. 예를 들…"
-date: "2026-03-20"
+description: "React Hook 완전 이해 단순한 함수가 아닌 React의 핵심 인터페이스 React를 사용하다 보면 자연스럽게 useState, useEffect, useRef와 같은 Hook을 접하게 됩니다. 대부분의 개발자는 Hook을 각각의 기능 단위…"
+date: "2026-03-21"
 tags: ["react"]
 published: true
-cover: "https://img1.daumcdn.net/thumb/R800x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2Fxq0dK%2FdJMcaaEEmZs%2FAAAAAAAAAAAAAAAAAAAAAOSITBJ4Nx8NoUoTbPuAXvEPFVafT5efzim4xH9eantB%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1782831599%26allow_ip%3D%26allow_referer%3D%26signature%3Dim%252BHRPpi01gOv2NFpU%252BT6R26RKo%253D"
+cover: "/images/blog/8_1.png"
 ---
-![](https://blog.kakaocdn.net/dna/xq0dK/dJMcaaEEmZs/AAAAAAAAAAAAAAAAAAAAAOSITBJ4Nx8NoUoTbPuAXvEPFVafT5efzim4xH9eantB/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1782831599&allow_ip=&allow_referer=&signature=im%2BHRPpi01gOv2NFpU%2BT6R26RKo%3D)
-
 ## React Hook 완전 이해 - 단순한 함수가 아닌 React의 핵심 인터페이스
 
 React를 사용하다 보면 자연스럽게 useState, useEffect, useRef와 같은 Hook을 접하게 됩니다.
@@ -30,18 +28,18 @@ Hook은 단순한 기능 제공 API가 아니라, React의 렌더링 시스템�
 
 이 글에서는 Hook을 단순 사용법이 아닌, React의 내부 동작과 렌더링 과정이라는 관점에서 정리해보겠습니다.
 
-* * *
+---
 
 ## Hook이 등장한 이유
 
 React 초창기에는 상태와 생명주기를 관리하기 위해 클래스 컴포넌트를 사용했습니다.
 
-```
+```jsx
 class Counter extends React.Component {
   state = { count: 0 };
 
   render() {
-    return {this.state.count};
+    return <div>{this.state.count}</div>;
   }
 }
 ```
@@ -54,37 +52,36 @@ class Counter extends React.Component {
 
 이러한 문제를 해결하기 위해 React 팀은 함수 컴포넌트에서도 상태와 생명주기를 사용할 수 있도록 하는 새로운 방식, 즉 Hook을 도입했습니다.
 
-```
+```jsx
 function Counter() {
   const [count, setCount] = useState(0);
-  return {count};
+  return <div>{count}</div>;
 }
 ```
 
 Hook의 도입으로 인해 함수 컴포넌트에서도 상태를 직접 관리할 수 있게 되었고, 로직을 함수 단위로 분리하여 재사용하는 것이 훨씬 자연스러워졌습니다.
 
-* * *
+---
 
 ## Hook의 정의를 다시 생각해보기
 
-공식 문서에서는 Hook을 “함수 컴포넌트에서 React 기능을 사용할 수 있게 해주는 함수”라고 정의합니다. 이 정의는 틀린 말은 아니지만, Hook의 본질을 충분히 설명해주지는 못합니다.
+공식 문서에서는 Hook을 "함수 컴포넌트에서 React 기능을 사용할 수 있게 해주는 함수"라고 정의합니다. 이 정의는 틀린 말은 아니지만, Hook의 본질을 충분히 설명해주지는 못합니다.
 
 보다 본질적인 관점에서 Hook은 다음과 같이 정의할 수 있습니다.
-
 > Hook은 React 내부에서 관리되는 상태와 생명주기 로직에 접근할 수 있도록 해주는 인터페이스입니다.
 
 이 정의가 중요한 이유는 Hook을 바라보는 기준을 바꿔주기 때문입니다. Hook을 단순한 기능이 아니라 React 내부 시스템과 연결되는 통로로 이해하게 되면, 각 Hook이 언제, 왜 필요한지에 대한 판단 기준이 명확해집니다.
 
-* * *
+---
 
 ## React 렌더링과 Hook의 관계
 
 Hook을 이해하기 위해서는 React의 렌더링 방식에 대한 이해가 반드시 필요합니다. React에서 함수 컴포넌트는 상태가 변경될 때마다 다시 실행됩니다.
 
-```
+```jsx
 function Component() {
   const [count, setCount] = useState(0);
-  return {count};
+  return <div>{count}</div>;
 }
 ```
 
@@ -96,28 +93,28 @@ setCount가 호출되면 컴포넌트 함수는 처음부터 다시 실행되고
 
 이 지점에서 Hook의 역할이 드러납니다. Hook은 함수 컴포넌트가 다시 실행될 때마다 React가 저장하고 있는 상태에 접근할 수 있도록 연결해주는 역할을 합니다.
 
-* * *
+---
 
 ## Hook의 동작 원리
 
 React는 Hook을 내부적으로 순서 기반으로 관리합니다. 이를 단순화하여 표현하면, React는 Hook을 배열 형태로 저장하고 현재 호출 위치를 index로 관리한다고 볼 수 있습니다.
 
-```
+```js
 let hooks = [];
 let index = 0;
 ```
 
 컴포넌트가 렌더링될 때마다 Hook이 호출되는 순서대로 상태가 매핑됩니다.
 
-```
+```js
 useState(); // index 0
 useEffect(); // index 1
 useState(); // index 2
 ```
 
-이 구조에서 중요한 점은 Hook이 이름이 아니라 호출 순서로 식별된다는 것입니다. React는 “첫 번째 useState”, “두 번째 useEffect”와 같이 순서를 기준으로 상태를 기억합니다.
+이 구조에서 중요한 점은 Hook이 이름이 아니라 호출 순서로 식별된다는 것입니다. React는 "첫 번째 useState", "두 번째 useEffect"와 같이 순서를 기준으로 상태를 기억합니다.
 
-* * *
+---
 
 ## Hook 규칙이 존재하는 이유
 
@@ -127,7 +124,7 @@ React에서는 Hook 사용에 대해 몇 가지 규칙을 강하게 요구합니
 
 예를 들어 다음과 같은 코드가 있다고 가정해보겠습니다.
 
-```
+```js
 if (flag) {
   useState(0);
 }
@@ -137,9 +134,9 @@ if (flag) {
 
 그 결과, 이전 렌더에서 사용되던 상태가 다른 Hook에 연결되는 문제가 발생하게 됩니다. 이러한 문제를 방지하기 위해 Hook은 항상 동일한 순서로 호출되어야 하며, 이를 보장하기 위한 규칙이 존재하는 것입니다.
 
-* * *
+---
 
-# Hook을 렌더링 관점에서 이해하기
+## Hook을 렌더링 관점에서 이해하기
 
 Hook을 기능 중심이 아니라 렌더링 관점에서 바라보면 훨씬 명확하게 정리할 수 있습니다.
 
@@ -151,11 +148,11 @@ useEffect는 렌더링이 완료된 이후 실행됩니다. 주로 API 호출이
 
 useRef는 값은 유지하지만 렌더링에는 영향을 주지 않는 저장소입니다. 렌더링과 무관하게 값을 유지해야 할 때 사용됩니다.
 
-이처럼 각 Hook은 React의 렌더링 과정에서 특정 시점과 역할을 담당합니다. 따라서 Hook을 이해할 때는 “무슨 기능인가”보다 “렌더링과 어떤 관계인가”를 기준으로 보는 것이 중요합니다.
+이처럼 각 Hook은 React의 렌더링 과정에서 특정 시점과 역할을 담당합니다. 따라서 Hook을 이해할 때는 "무슨 기능인가"보다 "렌더링과 어떤 관계인가"를 기준으로 보는 것이 중요합니다.
 
-* * *
+---
 
-# Hook을 잘 사용하기 위한 판단 기준
+## Hook을 잘 사용하기 위한 판단 기준
 
 Hook을 잘 사용하기 위한 기준은 다음과 같습니다.
 
@@ -165,7 +162,7 @@ Hook을 잘 사용하기 위한 기준은 다음과 같습니다.
 
 올바르지 않은 예시
 
-```
+```jsx
 function Timer() {
   const [intervalId, setIntervalId] = useState(null);
 
@@ -177,16 +174,16 @@ function Timer() {
     setIntervalId(id);
   }, []);
 
-  return 타이머 실행 중;
+  return <div>타이머 실행 중</div>;
 }
 ```
 
-이 경우 intervalId는 UI에 전혀 사용되지 않습니다.  
+이 경우 intervalId는 UI에 전혀 사용되지 않습니다.
 하지만 state로 관리하고 있기 때문에 불필요한 렌더링이 발생합니다.
 
 옳은 예시
 
-```
+```jsx
 function Timer() {
   const intervalRef = useRef(null);
 
@@ -196,7 +193,7 @@ function Timer() {
     }, 1000);
   }, []);
 
-  return 타이머 실행 중;
+  return <div>타이머 실행 중</div>;
 }
 ```
 
@@ -208,7 +205,7 @@ function Timer() {
 
 올바르지 않은 예시
 
-```
+```jsx
 function Example({ a, b }) {
   const [sum, setSum] = useState(0);
 
@@ -216,19 +213,19 @@ function Example({ a, b }) {
     setSum(a + b);
   }, [a, b]);
 
-  return {sum};
+  return <div>{sum}</div>;
 }
 ```
 
-이 코드는 단순 계산을 위해 useEffect를 사용하고 있습니다.  
+이 코드는 단순 계산을 위해 useEffect를 사용하고 있습니다.
 이 경우 불필요한 상태와 effect가 추가된 구조입니다.
 
 옳은 예시 (계산은 렌더에서)
 
-```
+```jsx
 function Example({ a, b }) {
   const sum = a + b;
-  return {sum};
+  return <div>{sum}</div>;
 }
 ```
 
@@ -236,7 +233,7 @@ function Example({ a, b }) {
 
 옳은 예시 (useEffect가 필요한 경우 / 외부 시스템)
 
-```
+```jsx
 function UserProfile({ userId }) {
   const [user, setUser] = useState(null);
 
@@ -246,7 +243,7 @@ function UserProfile({ userId }) {
       .then(setUser);
   }, [userId]);
 
-  return {user?.name};
+  return <div>{user?.name}</div>;
 }
 ```
 
@@ -258,7 +255,7 @@ function UserProfile({ userId }) {
 
 예를 들어,
 
-```
+```jsx
 function Form() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -272,9 +269,9 @@ function Form() {
 
   return (
     <>
-       setName(e.target.value)} />
-       setEmail(e.target.value)} />
-    
+      <input value={name} onChange={e => setName(e.target.value)} />
+      <input value={email} onChange={e => setEmail(e.target.value)} />
+    </>
   );
 }
 ```
@@ -283,7 +280,7 @@ function Form() {
 
 useReducer의 사용
 
-```
+```jsx
 function reducer(state, action) {
   switch (action.type) {
     case "SET_NAME":
@@ -306,24 +303,28 @@ function Form() {
 
   return (
     <>
-      
+      <input
+        value={state.name}
+        onChange={e =>
           dispatch({ type: "SET_NAME", payload: e.target.value })
         }
       />
-      
+      <input
+        value={state.email}
+        onChange={e =>
           dispatch({ type: "SET_EMAIL", payload: e.target.value })
         }
       />
-    
+    </>
   );
 }
 ```
 
-상태 변화가 “의도(액션)” 중심으로 관리되면서 로직이 훨씬 명확해집니다.
+상태 변화가 "의도(액션)" 중심으로 관리되면서 로직이 훨씬 명확해집니다.
 
 이러한 기준이 생기면 불필요한 Hook 사용이 줄어들고, 코드의 구조와 가독성이 크게 개선됩니다.
 
-* * *
+---
 
 ## 정리
 
@@ -335,13 +336,10 @@ Hook을 이해한다는 것은 곧 React가 어떤 방식으로 상태를 관리
 
 Hook에 대한 기본적인 정보를 다뤘으니 다음 시간에는
 
-\- useState
-
-\- useEffect
-
-\- useRef
-
-\- useReducer
+- useState
+- useEffect
+- useRef
+- useReducer
 
 에 대한 상세 정보와 활용 예시에 대해서 다루어보려고 합니다.
 

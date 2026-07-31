@@ -1,30 +1,28 @@
 ---
 title: "TanStack Query 에 대해서 알아보기!"
-description: "왜 TanStack Query를 사용해야 할까요?TanStack Query는 React 애플리케이션에서 서버 상태(Server State) 를 효율적으로 다루기 위한 라이브러리입니다.예전에는 React Query라는 이름으로 많이 알려져 있었고, v4부터 TanStack Query로 …"
-date: "2026-04-03"
+description: "왜 TanStack Query를 사용해야 할까요? TanStack Query는 React 애플리케이션에서 서버 상태(Server State) 를 효율적으로 다루기 위한 라이브러리입니다. 예전에는 React Query라는 이름으로 많이 알려져 있었…"
+date: "2026-04-04"
 tags: ["react"]
 published: true
-cover: "https://img1.daumcdn.net/thumb/R800x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FsIs9J%2FdJMcacWXFWM%2FAAAAAAAAAAAAAAAAAAAAAJV3cSUpe49wpN9OJNrokrNhGkdMm5VKDLTiqrq5o1xX%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1782831599%26allow_ip%3D%26allow_referer%3D%26signature%3DzFcSDHKEFTdqHBxFvJGEuWLnovM%253D"
+cover: "/images/blog/14_1.png"
 ---
-![](https://blog.kakaocdn.net/dna/sIs9J/dJMcacWXFWM/AAAAAAAAAAAAAAAAAAAAAJV3cSUpe49wpN9OJNrokrNhGkdMm5VKDLTiqrq5o1xX/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1782831599&allow_ip=&allow_referer=&signature=zFcSDHKEFTdqHBxFvJGEuWLnovM%3D)
-
 ## 왜 TanStack Query를 사용해야 할까요?
 
-TanStack Query는 React 애플리케이션에서 **서버 상태(Server State)** 를 효율적으로 다루기 위한 라이브러리입니다.  
+TanStack Query는 React 애플리케이션에서 **서버 상태(Server State)** 를 효율적으로 다루기 위한 라이브러리입니다.
 예전에는 React Query라는 이름으로 많이 알려져 있었고, v4부터 TanStack Query로 이름이 바뀌었습니다.
 
 React에서 상태는 크게 두 가지로 나눌 수 있습니다.
 
-하나는 사용자 입력, 모달 열림 여부, 탭 상태처럼 프론트엔드 내부에서 직접 관리하는 **클라이언트 상태**이고,  
+하나는 사용자 입력, 모달 열림 여부, 탭 상태처럼 프론트엔드 내부에서 직접 관리하는 **클라이언트 상태**이고,
 다른 하나는 서버에서 받아오고, 다시 동기화해야 하며, 시간이 지나면 낡을 수 있는 **서버 상태**입니다.
 
 서버 상태는 다음과 같은 특징을 가집니다 :
 
--   비동기다 (요청 → 응답 기다림)
--   실패할 수 있다
--   여러 컴포넌트에서 공유된다
--   시간이 지나면 낡는다 (stale)
--   다시 가져올 타이밍을 결정해야 한다
+- 비동기다 (요청 → 응답 기다림)
+- 실패할 수 있다
+- 여러 컴포넌트에서 공유된다
+- 시간이 지나면 낡는다 (stale)
+- 다시 가져올 타이밍을 결정해야 한다
 
 이러한 요소들을 useState나 useEffect로 다루기엔 **로직이 계속 반복되고 점점 복잡해질 수 있습니다.**
 
@@ -32,7 +30,7 @@ Tanstack Query (구 React Query)는 이러한 복잡한 문제를 손쉽게 다�
 
 TanStack Query 없이 데이터를 가져오면 보통 이렇게 작성합니다.
 
-```
+```js
 const [data, setData] = useState(null);
 const [isLoading, setIsLoading] = useState(false);
 const [error, setError] = useState(null);
@@ -52,11 +50,11 @@ useEffect(() => {
 }, []);
 ```
 
-이 코드를 모든 API 호출마다 반복해야 합니다.  
-  
+이 코드를 모든 API 호출마다 반복해야 합니다.
+
 그러나 TanStack Query를 쓰면 같은 작업이 이렇게 줄어듭니다.
 
-```
+```js
 const { data, isLoading, error } = useQuery({
   queryKey: ["posts"],
   queryFn: () => fetch("/api/posts").then((res) => res.json()),
@@ -71,23 +69,23 @@ const { data, isLoading, error } = useQuery({
 
 ### 설치
 
-```
+```bash
 npm install @tanstack/react-query
 ```
 
 개발 중 쿼리 상태를 눈으로 확인하고 싶다면 DevTools도 함께 설치하는 것을 추천합니다.
 
-```
+```bash
 npm install @tanstack/react-query-devtools
 ```
 
 ### QueryClient와 QueryClientProvider 설정
 
-앱의 최상단에서 QueryClient를 생성하고 QueryClientProvider로 감싸야 합니다.
+앱의 최상단에서 QueryClient를 생성하고 QueryClientProvider로 감싸야 합니다.
 
 이 설정이 있어야 앱 어디서든 TanStack Query 훅을 사용할 수 있습니다.
 
-```
+```tsx
 // main.tsx 또는 App.tsx
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -103,25 +101,24 @@ const queryClient = new QueryClient({
 
 export default function App() {
   return (
-    
-      
+    <QueryClientProvider client={queryClient}>
+      <MyApp />
       {/* 개발 환경에서만 Devtools 표시 */}
-      
-    
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   );
 }
 ```
-
-> QueryClient는 앱 전체에서 공유하는 캐시 저장소입니다.  
+> QueryClient는 앱 전체에서 공유하는 캐시 저장소입니다.
 > defaultOptions로 모든 쿼리에 공통 설정을 적용할 수 있어, 각 훅마다 같은 옵션을 반복할 필요가 없습니다.
 
-* * *
+---
 
 ## useQuery - 데이터 읽기
 
-서버에서 데이터를 가져올 때 사용하는 기본 훅입니다. 반드시 queryKey와 queryFn 두 가지를 전달해야 합니다.
+서버에서 데이터를 가져올 때 사용하는 기본 훅입니다. 반드시 queryKey와 queryFn 두 가지를 전달해야 합니다.
 
-```
+```jsx
 import { useQuery } from "@tanstack/react-query";
 
 async function fetchPosts() {
@@ -136,26 +133,26 @@ function PostList() {
     queryFn: fetchPosts,   // 실제 데이터를 가져오는 함수
   });
 
-  if (isLoading) return 로딩 중...;
-  if (isError) return 에러: {error.message};
+  if (isLoading) return <div>로딩 중...</div>;
+  if (isError) return <div>에러: {error.message}</div>;
 
   return (
-    
+    <ul>
       {data.map((post) => (
-        {post.title}
+        <li key={post.id}>{post.title}</li>
       ))}
-    
+    </ul>
   );
 }
 ```
 
 ## 동적 데이터 - queryKey에 변수 넣기
 
-특정 ID에 해당하는 데이터를 가져올 때는 queryKey에 해당 변수를 함께 넣어야 합니다.
+특정 ID에 해당하는 데이터를 가져올 때는 queryKey에 해당 변수를 함께 넣어야 합니다.
 
 키가 바뀌면 자동으로 새 요청을 보냅니다.
 
-```
+```jsx
 function PostDetail({ postId }: { postId: number }) {
   const { data, isLoading } = useQuery({
     queryKey: ["posts", "detail", postId],  // postId가 바뀌면 자동으로 재요청
@@ -163,41 +160,25 @@ function PostDetail({ postId }: { postId: number }) {
       fetch(`/api/posts/${postId}`).then((r) => r.json()),
   });
 
-  if (isLoading) return 로딩 중...;
-  return {data.title};
+  if (isLoading) return <div>로딩 중...</div>;
+  return <h1>{data.title}</h1>;
 }
 ```
-
-> queryFn에서 에러가 발생하려면 반드시 throw를 해야 합니다.  
-> fetch는 404, 500 응답도 성공으로 처리하므로, res.ok를 체크하고 직접 throw하는 습관이 중요합니다.
+> queryFn에서 에러가 발생하려면 반드시 throw를 해야 합니다.
+> fetch는 404, 500 응답도 성공으로 처리하므로, res.ok를 체크하고 직접 throw하는 습관이 중요합니다.
 
 ### 자주 쓰는 옵션
 
-enabled
+| 옵션 | 설명 |
+|---|---|
+| enabled | false이면 쿼리를 실행하지 않습니다. 특정 조건이 충족됐을 때만 요청할 때 씁니다. |
+| staleTime | 데이터를 신선하게 볼 시간(ms). 이 시간 안에는 재요청하지 않습니다. |
+| refetchOnWindowFocus | 탭을 다시 활성화했을 때 자동으로 재요청할지 여부. 기본값은 true입니다. |
+| retry | 실패 시 재시도 횟수. 기본값은 3입니다. |
+| select | 응답 데이터를 가공해서 반환합니다. 원본 캐시는 그대로 유지됩니다. |
+| placeholderData | 데이터가 없을 때 보여줄 임시 데이터입니다. 스켈레톤 대신 쓸 수 있습니다. |
 
-false이면 쿼리를 실행하지 않습니다. 특정 조건이 충족됐을 때만 요청할 때 씁니다.
-
-staleTime
-
-데이터를 신선하게 볼 시간(ms). 이 시간 안에는 재요청하지 않습니다.
-
-refetchOnWindowFocus
-
-탭을 다시 활성화했을 때 자동으로 재요청할지 여부. 기본값은 true입니다.
-
-retry
-
-실패 시 재시도 횟수. 기본값은 3입니다.
-
-select
-
-응답 데이터를 가공해서 반환합니다. 원본 캐시는 그대로 유지됩니다.
-
-placeholderData
-
-데이터가 없을 때 보여줄 임시 데이터입니다. 스켈레톤 대신 쓸 수 있습니다.
-
-```
+```js
 // enabled 예시 — userId가 있을 때만 요청
 const { data } = useQuery({
   queryKey: ["user", userId],
@@ -213,14 +194,14 @@ const { data: titles } = useQuery({
 });
 ```
 
-* * *
+---
 
 ## useMutation - 데이터 쓰기
 
-데이터를 생성/수정/삭제할 때 사용하는 훅입니다.  
-useQuery와 달리 자동으로 실행되지 않고, mutate()를 직접 호출해야 실행됩니다.
+데이터를 생성/수정/삭제할 때 사용하는 훅입니다.
+useQuery와 달리 자동으로 실행되지 않고, mutate()를 직접 호출해야 실행됩니다.
 
-```
+```jsx
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 async function createPost(newPost: { title: string; body: string }) {
@@ -252,32 +233,23 @@ function CreatePostForm() {
   };
 
   return (
-    
+    <button onClick={handleSubmit} disabled={mutation.isPending}>
       {mutation.isPending ? "저장 중..." : "게시글 작성"}
-    
+    </button>
   );
 }
 ```
 
 ### useMutation의 콜백 함수들
 
-onSuccess
+| 콜백 | 설명 |
+|---|---|
+| onSuccess | 요청이 성공했을 때 실행됩니다. 캐시 무효화나 리다이렉트 처리를 주로 합니다. |
+| onError | 요청이 실패했을 때 실행됩니다. 에러 메시지 표시나 롤백 처리를 합니다. |
+| onSettled | 성공/실패 관계없이 항상 실행됩니다. 최종 동기화나 로딩 해제에 씁니다. |
+| onMutate | 요청 직전에 실행됩니다. Optimistic Update의 시작점입니다. |
 
-요청이 성공했을 때 실행됩니다. 캐시 무효화나 리다이렉트 처리를 주로 합니다.
-
-onError
-
-요청이 실패했을 때 실행됩니다. 에러 메시지 표시나 롤백 처리를 합니다.
-
-onSettled
-
-성공/실패 관계없이 항상 실행됩니다. 최종 동기화나 로딩 해제에 씁니다.
-
-onMutate
-
-요청 직전에 실행됩니다. Optimistic Update의 시작점입니다.
-
-* * *
+---
 
 ## useQueryClient - 캐시 직접 다루기
 
@@ -285,7 +257,7 @@ useQueryClient는 캐시에 직접 접근할 수 있는 훅입니다.
 
 주로 mutation 이후 캐시를 갱신하거나, 특정 쿼리를 강제로 다시 가져올 때 씁니다.
 
-```
+```js
 const queryClient = useQueryClient();
 
 // 특정 쿼리 캐시를 무효화 → 다음 접근 시 재요청 발생
@@ -303,69 +275,44 @@ await queryClient.prefetchQuery({
   queryFn: () => fetchPostDetail(2),
 });
 ```
-
-> invalidateQueries는 캐시를 "낡았다"고 표시해 다음 접근 시 재요청을 유도합니다.  
+> invalidateQueries는 캐시를 "낡았다"고 표시해 다음 접근 시 재요청을 유도합니다.
 > setQueryData는 재요청 없이 캐시를 직접 덮어씁니다. 이 둘의 차이를 이해하면 mutation 후처리가 훨씬 명확해집니다.
 
-* * *
+---
 
 ## 주요 상태값 한눈에 보기
 
-useQuery와 useMutation이 반환하는 상태값은 처음엔 헷갈릴 수 있습니다. 자주 쓰는 것들만 정리했습니다.
+useQuery와 useMutation이 반환하는 상태값은 처음엔 헷갈릴 수 있습니다. 자주 쓰는 것들만 정리했습니다.
 
 ### useQuery 상태
 
-isLoading
+| 상태 | 설명 |
+|---|---|
+| isLoading | 캐시가 없고 처음으로 데이터를 가져오는 중 |
+| isFetching | 백그라운드 포함, 요청이 진행 중인 모든 상태 |
+| isSuccess | 데이터를 성공적으로 가져온 상태 |
+| isError | 요청이 실패한 상태 |
+| isStale | staleTime이 지나 데이터가 낡은 상태 |
+| isPending | 데이터가 아직 없는 상태 (v5 이상) |
 
-캐시가 없고 처음으로 데이터를 가져오는 중
-
-isFetching
-
-백그라운드 포함, 요청이 진행 중인 모든 상태
-
-isSuccess
-
-데이터를 성공적으로 가져온 상태
-
-isError
-
-요청이 실패한 상태
-
-isStale
-
-staleTime이 지나 데이터가 낡은 상태
-
-isPending
-
-데이터가 아직 없는 상태 (v5 이상)
-
-> isLoading은 캐시가 없어 처음 로딩 중일 때만 true입니다. isFetching은 백그라운드에서 갱신 중일 때도 true입니다. 스켈레톤 UI에는 isLoading을, 상단 로딩 바에는 isFetching을 쓰는 것이 일반적입니다.
+> isLoading은 캐시가 없어 처음 로딩 중일 때만 true입니다. isFetching은 백그라운드에서 갱신 중일 때도 true입니다. 스켈레톤 UI에는 isLoading을, 상단 로딩 바에는 isFetching을 쓰는 것이 일반적입니다.
 
 ### useMutation 상태
 
-isPending
+| 상태 | 설명 |
+|---|---|
+| isPending | 요청이 진행 중인 상태 |
+| isSuccess | 요청이 성공한 상태 |
+| isError | 요청이 실패한 상태 |
+| isIdle | 아직 실행되지 않은 초기 상태 |
 
-요청이 진행 중인 상태
+---
 
-isSuccess
-
-요청이 성공한 상태
-
-isError
-
-요청이 실패한 상태
-
-isIdle
-
-아직 실행되지 않은 초기 상태
-
-* * *
-
-## 실전 예제 -게시글 CRUD
+## 실전 예제 - 게시글 CRUD
 
 지금까지 배운 것들을 하나로 묶어봅니다. 게시글 목록 조회, 상세 조회, 생성, 삭제를 모두 담은 예제입니다.
 
-```
+```ts
 // api.ts — API 함수 정의
 export const api = {
   getPosts: () =>
@@ -386,7 +333,7 @@ export const api = {
 };
 ```
 
-```
+```ts
 // postKeys.ts — Query Key 팩토리
 export const postKeys = {
   all: ["posts"] as const,
@@ -395,7 +342,7 @@ export const postKeys = {
 };
 ```
 
-```
+```jsx
 // PostList.tsx — 목록 조회 + 삭제
 function PostList() {
   const queryClient = useQueryClient();
@@ -413,26 +360,27 @@ function PostList() {
     },
   });
 
-  if (isLoading) return 로딩 중...;
+  if (isLoading) return <div>로딩 중...</div>;
 
   return (
-    
+    <ul>
       {posts.map((post) => (
-        
+        <li key={post.id}>
           {post.title}
-           deleteMutation.mutate(post.id)}
+          <button
+            onClick={() => deleteMutation.mutate(post.id)}
             disabled={deleteMutation.isPending}
           >
             삭제
-          
-        
+          </button>
+        </li>
       ))}
-    
+    </ul>
   );
 }
 ```
 
-```
+```jsx
 // CreatePost.tsx — 게시글 생성
 function CreatePost() {
   const queryClient = useQueryClient();
@@ -450,38 +398,40 @@ function CreatePost() {
   });
 
   return (
-    
-       setTitle(e.target.value)}
+    <div>
+      <input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
         placeholder="게시글 제목"
       />
-       createMutation.mutate({ title, body: "" })}
+      <button
+        onClick={() => createMutation.mutate({ title, body: "" })}
         disabled={createMutation.isPending || !title}
       >
         {createMutation.isPending ? "저장 중..." : "작성"}
-      
+      </button>
       {createMutation.isError && (
-        저장에 실패했습니다.
+        <p style={{ color: "red" }}>저장에 실패했습니다.</p>
       )}
-    
+    </div>
   );
 }
 ```
+> 생성 후 invalidateQueries와 setQueryData를 함께 쓰는 패턴은 실무에서 흔합니다. 목록은 서버에서 다시 받아오고, 상세는 응답 데이터를 바로 캐시에 넣어 다음 진입 시 즉시 보여줄 수 있습니다.
 
-> 생성 후 invalidateQueries와 setQueryData를 함께 쓰는 패턴은 실무에서 흔합니다. 목록은 서버에서 다시 받아오고, 상세는 응답 데이터를 바로 캐시에 넣어 다음 진입 시 즉시 보여줄 수 있습니다.
-
-* * *
+---
 
 ### 기초 정리 체크리스트
 
-1.  QueryClientProvider로 앱 최상단을 감싼다
-2.  데이터 읽기는 useQuery, 데이터 쓰기는 useMutation
-3.  queryKey는 리소스 종류와 조회 조건을 모두 포함한다
-4.  queryFn에서 에러가 나면 반드시 throw를 한다
-5.  mutation 성공 후에는 관련 캐시를 invalidateQueries로 무효화한다
-6.  isLoading과 isFetching의 차이를 구분해서 UI에 적용한다
-7.  개발 중에는 Devtools로 캐시 상태를 항상 확인한다
+1. QueryClientProvider로 앱 최상단을 감싼다
+2. 데이터 읽기는 useQuery, 데이터 쓰기는 useMutation
+3. queryKey는 리소스 종류와 조회 조건을 모두 포함한다
+4. queryFn에서 에러가 나면 반드시 throw를 한다
+5. mutation 성공 후에는 관련 캐시를 invalidateQueries로 무효화한다
+6. isLoading과 isFetching의 차이를 구분해서 UI에 적용한다
+7. 개발 중에는 Devtools로 캐시 상태를 항상 확인한다
 
-* * *
+---
 
 ## Query Key 설계 전략과 캐시 관리
 
@@ -489,7 +439,7 @@ TanStack Query에서 Query Key는 캐시를 식별하는 기준입니다.
 
 필터·정렬·페이지네이션이 붙기 시작하면 단순한 이름표로 다루기 어려워집니다. 조건이 다른 요청이 같은 캐시를 공유하거나, 의도치 않게 캐시가 재사용되는 문제가 생깁니다.
 
-* * *
+---
 
 ## 좋은 Query Key의 조건
 
@@ -506,15 +456,15 @@ TanStack Query에서 Query Key는 캐시를 식별하는 기준입니다.
 ["posts", "comments", postId]
 ```
 
-이 구조를 유지하면 \["posts"\]를 invalidate하는 것만으로 하위 캐시 전체를 무효화할 수 있습니다.
+이 구조를 유지하면 ["posts"]를 invalidate하는 것만으로 하위 캐시 전체를 무효화할 수 있습니다.
 
-* * *
+---
 
 ## Query Key Factory 패턴
 
 프로젝트가 커질수록 Query Key를 하드코딩하는 방식은 유지보수가 어려워집니다. 이럴 때 쓰는 것이 Query Key Factory 패턴입니다.
 
-```
+```ts
 export const postKeys = {
   all: ["posts"] as const,
   lists: () => [...postKeys.all, "list"] as const,
@@ -525,17 +475,16 @@ export const postKeys = {
 };
 ```
 
-```
+```ts
 useQuery({
   queryKey: postKeys.list({ page: 1, sort: "latest", category: "react" }),
   queryFn: () => fetchPosts({ page: 1, sort: "latest", category: "react" }),
 });
 ```
-
-> 오타를 줄이고, invalidateQueries나 setQueryData를 쓸 때 실수를 방지해 줍니다.  
+> 오타를 줄이고, invalidateQueries나 setQueryData를 쓸 때 실수를 방지해 줍니다.
 > 부수적으로 캐시 구조를 코드로 문서화하는 역할도 합니다.
 
-* * *
+---
 
 ## staleTime, gcTime
 
@@ -543,7 +492,7 @@ Query Key 설계만큼 캐시 정책도 같이 잡아야 합니다.
 
 **staleTime** 은 데이터를 신선하다고 볼 시간입니다.
 
-```
+```ts
 useQuery({
   queryKey: postKeys.detail(1),
   queryFn: () => fetchPostDetail(1),
@@ -551,7 +500,7 @@ useQuery({
 });
 ```
 
-1분으로 설정하면 1분 안에 같은 쿼리가 다시 마운트되어도 재요청하지 않습니다.  
+1분으로 설정하면 1분 안에 같은 쿼리가 다시 마운트되어도 재요청하지 않습니다.
 값이 너무 짧으면 요청이 과도해지고, 너무 길면 낡은 데이터를 오래 보여주게 됩니다.
 
 자주 바뀌지 않는 데이터는 길게, 실시간성이 중요한 데이터는 짧게 가져가는 것이 일반적입니다.
@@ -560,13 +509,13 @@ useQuery({
 
 staleTime이 신선도의 문제라면, gcTime은 보관 기간의 문제입니다. 둘을 혼동하지 않는 것이 중요합니다.
 
-* * *
+---
 
 ## invalidateQueries vs setQueryData
 
 mutation 이후에 무조건 invalidateQueries만 쓰는 경우가 많은데, 상황에 따라 setQueryData가 더 적합할 때가 있습니다.
 
-```
+```ts
 // 데이터를 다시 가져와야 할 때
 queryClient.invalidateQueries({ queryKey: postKeys.lists() });
 
@@ -576,7 +525,7 @@ queryClient.setQueryData(postKeys.detail(post.id), post);
 
 서버 응답으로 확정된 데이터를 캐시에 바로 반영할 수 있다면 setQueryData가 효율적입니다. 영향 범위가 넓거나 최신 상태를 반드시 서버에서 받아와야 한다면 invalidateQueries가 안전합니다.
 
-* * *
+---
 
 ## Optimistic Update 패턴 심화
 
@@ -586,7 +535,7 @@ queryClient.setQueryData(postKeys.detail(post.id), post);
 
 ### 기본 흐름
 
-```
+```ts
 const mutation = useMutation({
   mutationFn: toggleLike,
   onMutate: async (postId: number) => {
@@ -627,9 +576,9 @@ const mutation = useMutation({
 
 좋아요, 북마크, 체크박스처럼 결과가 단순하고 예측 가능한 경우에 잘 맞습니다. 반면 아래 상황에서는 피하는 것이 낫습니다.
 
--   서버 검증이 복잡한 경우
--   실패 가능성이 높은 경우
--   응답이 서버 계산 결과에 크게 의존하는 경우 (slug 생성, 작성자 정보 가공 등)
+- 서버 검증이 복잡한 경우
+- 실패 가능성이 높은 경우
+- 응답이 서버 계산 결과에 크게 의존하는 경우 (slug 생성, 작성자 정보 가공 등)
 
 이런 경우에는 로딩 상태를 보여주고 성공 후 invalidate하는 것이 더 안정적입니다.
 
@@ -637,7 +586,7 @@ const mutation = useMutation({
 
 게시글 하나가 목록 캐시와 상세 캐시 양쪽에 존재하는 경우가 많습니다. 상세만 수정하고 목록을 그대로 두면 UI가 어긋납니다.
 
-```
+```ts
 queryClient.setQueriesData(
   { queryKey: postKeys.lists() },
   (oldData: any) => {
@@ -663,13 +612,13 @@ queryClient.setQueriesData(
 
 Optimistic Update를 설계할 때는 해당 데이터가 어느 캐시에 중복으로 존재하는지를 반드시 함께 고려해야 합니다.
 
-* * *
+---
 
 ## Prefetching 전략과 성능 최적화
 
 사용자가 진입하기 전에 데이터를 미리 가져와 화면 전환 시 로딩을 줄이는 전략입니다.
 
-```
+```ts
 const handlePrefetch = (postId: number) => {
   queryClient.prefetchQuery({
     queryKey: postKeys.detail(postId),
@@ -685,17 +634,17 @@ const handlePrefetch = (postId: number) => {
 
 모든 페이지에 붙이는 것이 아니라, 사용자의 다음 행동이 예측 가능한 지점에 한해 적용해야 합니다.
 
--   목록 → 상세 이동이 잦은 구조
--   탭 전환이 빈번한 구조
--   hover, focus, viewport 진입 시점을 활용할 수 있는 경우
+- 목록 → 상세 이동이 잦은 구조
+- 탭 전환이 빈번한 구조
+- hover, focus, viewport 진입 시점을 활용할 수 있는 경우
 
 예측 없이 모든 페이지를 prefetch하면 네트워크 낭비와 캐시 오염으로 이어집니다.
 
-* * *
+---
 
 ## Infinite Query 최적화
 
-```
+```ts
 const {
   data,
   fetchNextPage,
@@ -719,7 +668,7 @@ cursor 기반은 "마지막으로 본 항목의 다음부터"가 기준이므로
 
 ### 성능 문제
 
-```
+```ts
 const allPosts = data?.pages.flatMap((page) => page.items) ?? [];
 ```
 
@@ -727,7 +676,7 @@ const allPosts = data?.pages.flatMap((page) => page.items) ?? [];
 
 ### 중복 호출 방지
 
-```
+```ts
 useEffect(() => {
   if (inView && hasNextPage && !isFetchingNextPage) {
     fetchNextPage();
@@ -737,57 +686,59 @@ useEffect(() => {
 
 hasNextPage와 isFetchingNextPage 조건이 없으면 sentinel이 보이는 동안 요청이 연속으로 나갑니다.
 
-* * *
+---
 
 ## Error / Loading 바운더리 패턴
 
 ### 컴포넌트마다 처리할 때의 문제
 
-```
+```jsx
 const { data, isLoading, isError, error } = useQuery(...);
 
-if (isLoading) return ;
-if (isError) return ;
-return ;
+if (isLoading) return <Loading />;
+if (isError) return <ErrorMessage error={error} />;
+return <Content data={data} />;
 ```
 
 페이지가 적을 때는 괜찮습니다. 화면이 늘어나면 이 분기문이 모든 컴포넌트에 반복되고, 로딩 UI와 에러 처리 기준이 제각각이 됩니다.
 
 ### Suspense 기반 로딩 처리
 
-```
+```ts
 useSuspenseQuery({
   queryKey: postKeys.detail(postId),
   queryFn: () => fetchPostDetail(postId),
 });
 ```
 
-```
-}>
-  
-
+```jsx
+<Suspense fallback={<PostDetailSkeleton />}>
+  <PostDetail />
+</Suspense>
 ```
 
 컴포넌트 내부에서 isLoading 분기를 작성할 필요 없이, 상위에서 fallback을 통일해 관리할 수 있습니다.
 
 ### QueryErrorResetBoundary
 
-```
-
+```jsx
+<QueryErrorResetBoundary>
   {({ reset }) => (
-     (
-        
+    <ErrorBoundary
+      onReset={reset}
+      fallbackRender={({ resetErrorBoundary }) => (
+        <div>
           데이터를 불러오지 못했습니다.
-          다시 시도
-        
+          <button onClick={resetErrorBoundary}>다시 시도</button>
+        </div>
       )}
     >
-      로딩 중...}>
-        
-      
-    
+      <Suspense fallback={<div>로딩 중...</div>}>
+        <PostDetail />
+      </Suspense>
+    </ErrorBoundary>
   )}
-
+</QueryErrorResetBoundary>
 ```
 
 쿼리 실패 시 Error Boundary가 에러를 잡고, "다시 시도"를 누르면 reset을 통해 쿼리가 재실행됩니다.
@@ -796,13 +747,13 @@ useSuspenseQuery({
 
 모든 에러를 Boundary로 올릴 필요는 없습니다.
 
--   **Boundary**: 페이지 진입에 필수적인 데이터 조회 실패
--   **로컬 메시지·토스트**: 댓글 등록, 좋아요처럼 페이지 자체는 유지되어야 하는 경우
--   **섹션 수준 fallback**: 특정 영역만 실패한 경우
+- **Boundary**: 페이지 진입에 필수적인 데이터 조회 실패
+- **로컬 메시지·토스트**: 댓글 등록, 좋아요처럼 페이지 자체는 유지되어야 하는 경우
+- **섹션 수준 fallback**: 특정 영역만 실패한 경우
 
 계층을 나눠두면 에러 처리 코드도 정리되고 UX도 자연스러워집니다.
 
-* * *
+---
 
 ## 마무리
 

@@ -1,21 +1,19 @@
 ---
 title: "React useState 완전 이해하기"
-description: "useState 완전 이해하기 - 렌더링을 제어하는 상태 관리의 본질React에서 useState는 가장 기본적인 Hook이지만, 단순한 상태 저장 도구로 이해하기에는 부족한 개념입니다.useState는 값을 저장하는 기능을 넘어서, 렌더링을 제어하는 핵심 메커니즘입니다.이번 글에서는…"
-date: "2026-03-20"
+description: "useState 완전 이해하기 렌더링을 제어하는 상태 관리의 본질 React에서 useState는 가장 기본적인 Hook이지만, 단순한 상태 저장 도구로 이해하기에는 부족한 개념입니다. useState는 값을 저장하는 기능을 넘어서, 렌더링을 제…"
+date: "2026-03-21"
 tags: ["react"]
 published: true
-cover: "https://img1.daumcdn.net/thumb/R800x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2Fbeh6Vq%2FdJMcacbnezu%2FAAAAAAAAAAAAAAAAAAAAACOWA0M_6E-obcfZYPIE57Yz41JaxXTbvmgnvc7XxBbv%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1782831599%26allow_ip%3D%26allow_referer%3D%26signature%3D%252FVTgSHoqS6l%252BJ6FB0DDOW13Ilpc%253D"
+cover: "/images/blog/9_1.png"
 ---
-![](https://blog.kakaocdn.net/dna/beh6Vq/dJMcacbnezu/AAAAAAAAAAAAAAAAAAAAACOWA0M_6E-obcfZYPIE57Yz41JaxXTbvmgnvc7XxBbv/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1782831599&allow_ip=&allow_referer=&signature=%2FVTgSHoqS6l%2BJ6FB0DDOW13Ilpc%3D)
-
 ## useState 완전 이해하기 - 렌더링을 제어하는 상태 관리의 본질
 
-React에서 useState는 가장 기본적인 Hook이지만, 단순한 상태 저장 도구로 이해하기에는 부족한 개념입니다.  
+React에서 useState는 가장 기본적인 Hook이지만, 단순한 상태 저장 도구로 이해하기에는 부족한 개념입니다.
 useState는 값을 저장하는 기능을 넘어서, **렌더링을 제어하는 핵심 메커니즘**입니다.
 
 이번 글에서는 useState의 동작 방식과 함께, 실제 개발에서 반드시 이해해야 할 포인트들을 중심으로 살펴보겠습니다.
 
-* * *
+---
 
 ## 렌더링이란 무엇인가
 
@@ -23,40 +21,38 @@ useState는 값을 저장하는 기능을 넘어서, **렌더링을 제어하는
 
 따라서 렌더링이란 무엇인지에 대해서 먼저 짚고 넘어가겠습니다.
 
-React에서 렌더링이란,  
+React에서 렌더링이란,
 **현재 state와 props를 기반으로 UI를 계산하는 과정**을 의미합니다.
 
 조금 더 구체적으로 보면 렌더링은 다음과 같은 흐름으로 이루어집니다.
 
--   컴포넌트 함수가 다시 실행된다
--   JSX를 기반으로 새로운 UI 구조가 생성된다
--   이전 결과와 비교하여 변경된 부분만 실제 DOM에 반영된다
+- 컴포넌트 함수가 다시 실행된다
+- JSX를 기반으로 새로운 UI 구조가 생성된다
+- 이전 결과와 비교하여 변경된 부분만 실제 DOM에 반영된다
 
-즉, 렌더링은 단순히 화면을 “다시 그리는 것”이 아니라  
-**변경된 상태를 기준으로 UI를 재계산하는 과정**입니다.
+즉, 렌더링은 단순히 화면을 "다시 그리는 것"이 아니라 **변경된 상태를 기준으로 UI를 재계산하는 과정**입니다.
 
-이 개념이 중요한 이유는, React에서 UI는 직접 변경하는 것이 아니라  
-항상 state를 기반으로 다시 계산되기 때문입니다.
+이 개념이 중요한 이유는, React에서 UI는 직접 변경하는 것이 아니라 항상 state를 기반으로 다시 계산되기 때문입니다.
 
-* * *
+---
 
 ## 그래서 왜 useState가 필요할까?
 
 다음 코드를 먼저 보겠습니다.
 
-```
+```jsx
 function Counter() {
   let count = 0;
 
   return (
-     count++}>
+    <button onClick={() => count++}>
       {count}
-    
+    </button>
   );
 }
 ```
 
-이 코드는 버튼을 클릭해도 값이 증가하지 않습니다.  
+이 코드는 버튼을 클릭해도 값이 증가하지 않습니다.
 그 이유는 React의 렌더링 방식 때문입니다.
 
 React의 함수 컴포넌트는 렌더링될 때마다 다시 실행됩니다.
@@ -65,7 +61,7 @@ React의 함수 컴포넌트는 렌더링될 때마다 다시 실행됩니다.
 
 즉, 일반 변수는 렌더링 사이에서 값을 유지할 수 없습니다.
 
-왜냐하면 새로운 렌더링이 발생했다는 것은 Counter 함수가 다시 실행되었다는 의미이고,  
+왜냐하면 새로운 렌더링이 발생했다는 것은 Counter 함수가 다시 실행되었다는 의미이고,
 이 과정에서 count 변수 역시 다시 0으로 선언되기 때문입니다.
 
 또한 변수의 값이 변경되더라도, React는 이러한 변화를 감지하지 못합니다.
@@ -74,21 +70,21 @@ React의 함수 컴포넌트는 렌더링될 때마다 다시 실행됩니다.
 
 (렌더링은 화면을 단순히 다시 그리는 것이 아니라, state를 기반으로 UI를 다시 계산하는 과정입니다.)
 
-이 문제를 해결하기 위해서는 값이 컴포넌트 외부 어딘가에 저장되어야 하며,  
+이 문제를 해결하기 위해서는 값이 컴포넌트 외부 어딘가에 저장되어야 하며,
 렌더링 시 해당 값을 다시 가져올 수 있어야 합니다.
 
 그리고 그 값의 변경을 React가 인식할 수 있도록, **렌더링을 다시 요청할 수 있는 메커니즘이 필요합니다.**
 
 이 역할을 수행하는 것이 바로 **useState**입니다.
 
-```
+```jsx
 function Counter() {
   const [count, setCount] = useState(0);
 
   return (
-     setCount(count + 1)}>
+    <button onClick={() => setCount(count + 1)}>
       {count}
-    
+    </button>
   );
 }
 ```
@@ -99,73 +95,71 @@ function Counter() {
 
 setCount가 호출되면 React는 상태 변경을 반영하고, 해당 컴포넌트를 다시 렌더링합니다.
 
-이 과정 덕분에 count 값은 렌더링 사이에서도 유지되며,  
-버튼을 클릭할 때마다 화면에 최신 값이 반영됩니다.
+이 과정 덕분에 count 값은 렌더링 사이에서도 유지되며, 버튼을 클릭할 때마다 화면에 최신 값이 반영됩니다.
 
-* * *
+---
 
 ## State란 무엇인가? (컴포넌트의 기억)
 
-앞에서 살펴본 것처럼, 일반 변수는 렌더링이 발생할 때마다 초기화되기 때문에 값을 유지할 수 없습니다.  
-이 문제를 해결하기 위해 React는 “state”라는 개념을 제공합니다.
+앞에서 살펴본 것처럼, 일반 변수는 렌더링이 발생할 때마다 초기화되기 때문에 값을 유지할 수 없습니다.
+이 문제를 해결하기 위해 React는 "state"라는 개념을 제공합니다.
 
 React에서 state는 다음과 같이 이해할 수 있습니다.
-
 > **state는 컴포넌트가 렌더링 사이에서도 기억해야 하는 값입니다.**
 
 조금 더 구체적으로 말하면, state는 다음과 같은 특징을 가집니다.
 
--   렌더링이 다시 일어나도 값이 유지된다
--   값이 변경되면 컴포넌트가 다시 렌더링된다
--   컴포넌트 내부에 종속되어 관리된다
+- 렌더링이 다시 일어나도 값이 유지된다
+- 값이 변경되면 컴포넌트가 다시 렌더링된다
+- 컴포넌트 내부에 종속되어 관리된다
 
 즉, 사용자의 입력값이나 버튼 클릭 횟수처럼 **변경에 따라 화면이 다시 그려져야 하는 데이터는**
 
 단순 변수로는 관리할 수 없고, state로 관리해야 합니다.
 
-또한 중요한 점은, state는 단순히 값을 저장하는 역할만 하는 것이 아니라  
+또한 중요한 점은, state는 단순히 값을 저장하는 역할만 하는 것이 아니라
 
 **UI를 결정하는 기준이 되는 값**이라는 것입니다.
 
 예를 들어 다음과 같은 코드가 있다고 해보겠습니다.
 
-```
+```jsx
 function Toggle() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-     setIsOpen(!isOpen)}>
+    <button onClick={() => setIsOpen(!isOpen)}>
       {isOpen ? "열림" : "닫힘"}
-    
+    </button>
   );
 }
 ```
 
-여기서 isOpen 값에 따라 화면에 표시되는 텍스트가 달라집니다.  
+여기서 isOpen 값에 따라 화면에 표시되는 텍스트가 달라집니다.
 즉, state는 단순 데이터가 아니라 **UI의 상태를 표현하는 값**입니다.
 
 정리하면 state는 다음과 같이 이해할 수 있습니다.
 
--   컴포넌트가 기억해야 하는 값
--   UI를 결정하는 기준이 되는 값
--   변경되면 렌더링을 다시 발생시키는 값
+- 컴포넌트가 기억해야 하는 값
+- UI를 결정하는 기준이 되는 값
+- 변경되면 렌더링을 다시 발생시키는 값
 
-이러한 이유로 React에서는 일반 변수 대신 state를 사용하여  
+이러한 이유로 React에서는 일반 변수 대신 state를 사용하여
 동적인 UI를 구현하게 됩니다.
 
-* * *
+---
 
 ## 왜 useState는 배열 형태로 반환될까?
 
 useState는 다음과 같은 형태로 사용합니다.
 
-```
+```js
 const [count, setCount] = useState(0);
 ```
 
 처음 보면 왜 state와 setState를 동시에 지정하며, 왜 배열 형태로 값을 지정하는 지에 대한 의문이 생길 수 있습니다.
 
-```
+```js
 const state = useState(0);
 // state[0] → 값
 // state[1] → setter
@@ -175,37 +169,37 @@ const state = useState(0);
 
 첫 번째는 **이름을 자유롭게 지정할 수 있기 때문입니다.**
 
-```
+```js
 const [value, setValue] = useState(0);
 const [age, setAge] = useState(20);
 ```
 
 만약 객체로 반환된다면 항상 동일한 키 이름을 사용해야 합니다.
 
-```
+```js
 const { state, setState } = useState(0);
 ```
 
-이 경우 여러 개의 상태를 사용할 때 이름 충돌이 발생하거나,  
+이 경우 여러 개의 상태를 사용할 때 이름 충돌이 발생하거나,
 매번 이름을 바꿔주는 번거로운 작업이 필요합니다.
 
-하지만 배열 구조를 사용하면 [구조 분해 할당](https://ko.javascript.info/destructuring-assignment)을 통해  
+하지만 배열 구조를 사용하면 [구조 분해 할당](https://ko.javascript.info/destructuring-assignment)을 통해
 개발자가 원하는 이름을 자유롭게 지정할 수 있습니다.
 
 두 번째는 **순서 기반으로 값이 고정되기 때문입니다.**
 
-```
+```js
 const [count, setCount] = useState(0);
 ```
 
-여기서 첫 번째 요소는 항상 상태 값, 두 번째 요소는 항상 setter입니다.  
+여기서 첫 번째 요소는 항상 상태 값, 두 번째 요소는 항상 setter입니다.
 이 규칙이 고정되어 있기 때문에 React는 내부적으로 Hook을 안정적으로 관리할 수 있습니다.
 
-* * *
+---
 
 ## setState는 값 변경이 아니라 렌더 요청이다
 
-```
+```js
 setCount(1);
 ```
 
@@ -213,16 +207,16 @@ setCount(1);
 
 예를 하나 들어보겠습니다.
 
-```
+```jsx
 function Counter() {
   const [count, setCount] = useState(0);
 
   console.log("렌더링 중", count);
 
   return (
-     setCount(count + 1)}>
+    <button onClick={() => setCount(count + 1)}>
       {count}
-    
+    </button>
   );
 }
 ```
@@ -233,9 +227,9 @@ function Counter() {
 
 즉, setState의 핵심 역할은 단순한 값 변경이 아니라 **새로운 렌더링을 요청하는 것**입니다.
 
-이 때문에 React의 state는 일반 변수와 다르게 동작하며, 상태 업데이트를 이해할 때도 “값 대입”이 아니라 “다음 렌더를 위한 업데이트”라는 관점으로 접근해야 합니다.
+이 때문에 React의 state는 일반 변수와 다르게 동작하며, 상태 업데이트를 이해할 때도 "값 대입"이 아니라 "다음 렌더를 위한 업데이트"라는 관점으로 접근해야 합니다.
 
-* * *
+---
 
 ## State는 격리되고 비공개로 유지됩니다
 
@@ -245,39 +239,39 @@ useState로 만든 상태는 전역적으로 공유되는 값이 아니라, 해�
 
 즉, 같은 컴포넌트를 여러 번 렌더링하더라도 각각의 state는 서로 독립적으로 동작합니다.
 
-```
+```jsx
 function Counter() {
   const [count, setCount] = useState(0);
 
   return (
-     setCount(count + 1)}>
+    <button onClick={() => setCount(count + 1)}>
       {count}
-    
+    </button>
   );
 }
 
 function App() {
   return (
     <>
-      
-      
-    
+      <Counter />
+      <Counter />
+    </>
   );
 }
 ```
 
-위 코드에서 두 개의 Counter는 같은 컴포넌트이지만, 서로 다른 state를 가집니다.  
+위 코드에서 두 개의 Counter는 같은 컴포넌트이지만, 서로 다른 state를 가집니다.
 한쪽의 count가 증가해도 다른 쪽의 count는 바뀌지 않습니다.
 
 이처럼 React의 state는 각 컴포넌트 내부에 격리되어 있으며, 외부에서 직접 접근할 수 없는 비공개 값으로 유지됩니다.
 
-* * *
+---
 
 ## 상태 업데이트가 기대와 다르게 동작하는 이유
 
 다음 코드를 보겠습니다.
 
-```
+```js
 const handleClick = () => {
   setCount(count + 1);
   setCount(count + 1);
@@ -286,78 +280,77 @@ const handleClick = () => {
 
 이 코드는 count가 2 증가할 것 같지만 실제로는 1만 증가합니다.
 
-이유는 React가 상태 업데이트를 즉시 반영하지 않고  
+이유는 React가 상태 업데이트를 즉시 반영하지 않고
 여러 업데이트를 모아서 처리하기 때문입니다.
 
-두 번의 setCount가 모두 같은 count 값을 기준으로 실행되기 때문에  
+두 번의 setCount가 모두 같은 count 값을 기준으로 실행되기 때문에
 결과적으로 한 번만 증가합니다.
 
 이 문제를 해결하려면 함수형 업데이트를 사용해야 합니다.
 
 ### 왜 함수형 업데이트를 사용해야 하는가
 
-```
+```js
 const handleClick = () => {
   setCount((prev) => prev + 1);
   setCount((prev) => prev + 1);
 };
 ```
 
-함수형 업데이트는 이전 상태가 아니라 **최신 상태를 기준으로 계산**됩니다.
+함수형 업데이트는 이전 상태가 아니라 **최신 상태를 기준으로 계산**됩니다.
 
 React는 이를 다음과 같이 처리합니다.
 
--   첫 번째 호출: 0 -> 1
--   두 번째 호출: 1 -> 2
+- 첫 번째 호출: 0 -> 1
+- 두 번째 호출: 1 -> 2
 
 즉, 각각의 업데이트가 순차적으로 적용됩니다.
 
 따라서 다음 기준을 기억하는 것이 중요합니다.
-
 > 이전 상태를 기반으로 계산할 때는 반드시 함수형 업데이트를 사용한다
 
-* * *
+---
 
 ## 초기값은 언제 실행되는가
 
-useState의 초기값은 매 렌더마다 실행되지 않습니다.  
+useState의 초기값은 매 렌더마다 실행되지 않습니다.
 초기 렌더에서 한 번만 사용됩니다.
 
 하지만 다음과 같은 코드는 주의가 필요합니다.
 
-```
+```js
 const [value, setValue] = useState(expensiveCalculation());
 ```
 
-이 코드는 겉보기에는 문제가 없어 보이지만, 실제로는 expensiveCalculation() 함수가  
+이 코드는 겉보기에는 문제가 없어 보이지만, 실제로는 expensiveCalculation() 함수가
 **렌더링이 발생할 때마다 계속 실행될 수 있습니다.**
 
 그 이유는 JavaScript의 함수 호출 방식 때문입니다.
 
-```
+```js
 useState(expensiveCalculation());
 ```
 
-이 코드는 useState에 값을 전달하기 전에  
+이 코드는 useState에 값을 전달하기 전에
 이미 expensiveCalculation()이 먼저 실행됩니다.
 
-즉, React가 초기값을 한 번만 사용하는 것과는 별개로,  
+즉, React가 초기값을 한 번만 사용하는 것과는 별개로,
 **함수 자체는 렌더링마다 계속 호출되는 구조**입니다.
 
 ### 해결 방법 - Lazy Initialization
 
-이 문제를 해결하기 위해 useState는 “[지연 초기화(Lazy Initialization)](https://legacy.reactjs.org/docs/hooks-reference.html#lazy-initial-state)”를 지원합니다.
+이 문제를 해결하기 위해 useState는 "[지연 초기화(Lazy Initialization)](https://legacy.reactjs.org/docs/hooks-reference.html#lazy-initial-state)"를 지원합니다.
 
 이를 통해 재렌더링시 해당 **함수**가 무시되고 다시 실행되지 않습니다.
 
-```
+```js
 const [value, setValue] = useState(() => expensiveCalculation());
 ```
 
 이렇게 **값(혹은 함수의 return 결과)**이 아닌 **함수**를 넘기면 React는 다음과 같이 동작합니다.
 
--   초기 렌더링 시 -> 함수 실행하여 초기값 생성
--   이후 렌더링 -> 함수 실행하지 않음
+- 초기 렌더링 시 -> 함수 실행하여 초기값 생성
+- 이후 렌더링 -> 함수 실행하지 않음
 
 즉, 함수는 **딱 한 번만 실행됩니다.**
 
@@ -365,13 +358,13 @@ const [value, setValue] = useState(() => expensiveCalculation());
 
 이 방식은 다음과 같은 경우에 특히 유용합니다.
 
--   계산 비용이 큰 함수 (복잡한 연산)
--   localStorage / sessionStorage에서 값 읽기
--   JSON 파싱 등 초기 데이터 처리
+- 계산 비용이 큰 함수 (복잡한 연산)
+- localStorage / sessionStorage에서 값 읽기
+- JSON 파싱 등 초기 데이터 처리
 
 예를 들어 다음과 같은 경우입니다.
 
-```
+```js
 const [theme, setTheme] = useState(() => {
   return localStorage.getItem("theme") || "light";
 });
@@ -381,46 +374,46 @@ const [theme, setTheme] = useState(() => {
 
 ### 하지만 무작정 지연 초기화(Lazy Initialization)를 사용해서는 안됩니다.
 
-Lazy Initialization은 초기값을 한 번만 계산하는 방식이기 때문에,  
+Lazy Initialization은 초기값을 한 번만 계산하는 방식이기 때문에,
 모든 상황에서 사용할 수 있는 것은 아닙니다.
 
 특히 다음과 같은 경우에는 사용하면 문제가 발생할 수 있습니다.
 
 예를 들어 props에 따라 값이 달라져야 하는 경우를 보겠습니다.
 
-```
+```jsx
 function Profile({ userId }) {
   const [user, setUser] = useState(() => fetchUser(userId));
 }
 ```
 
-이 코드는 처음 렌더링 시에는 정상적으로 동작하지만,  
+이 코드는 처음 렌더링 시에는 정상적으로 동작하지만,
 이후 userId가 변경되더라도 fetchUser는 다시 실행되지 않습니다.
 
 그 이유는 Lazy Initialization이 **초기 렌더링 시에만 실행되기 때문**입니다.
 
-따라서 외부 값(props, state 등)에 따라 변경되어야 하는 값은  
+따라서 외부 값(props, state 등)에 따라 변경되어야 하는 값은
 Lazy Initialization으로 처리하면 안 되고, 별도의 로직을 통해 동기화해야 합니다.
 
-```
+```js
 useEffect(() => {
   fetchUser(userId).then(setUser);
 }, [userId]);
 ```
 
-즉, Lazy Initialization은 “초기값 최적화”를 위한 기능일 뿐,  
+즉, Lazy Initialization은 "초기값 최적화"를 위한 기능일 뿐,
 값의 변화를 반영하기 위한 도구는 아닙니다.
 
 #### 요약하자면!
 
--   useState는 초기값을 한 번만 사용한다
--   하지만 함수 호출은 렌더마다 실행될 수 있다
--   이를 방지하려면 함수 형태로 전달해야 한다 (지연 초기화를 사용)
--    항상 모든 경우에 지연 초기화를 사용해선 안된다.
+- useState는 초기값을 한 번만 사용한다
+- 하지만 함수 호출은 렌더마다 실행될 수 있다
+- 이를 방지하려면 함수 형태로 전달해야 한다 (지연 초기화를 사용)
+- 항상 모든 경우에 지연 초기화를 사용해선 안된다.
 
 > 즉, 초기값 계산 비용이 크고 값의 변화가 없다면 반드시 함수 형태로 넘기는 것이 좋습니다.
 
-* * *
+---
 
 ## 새로고침을 하면 상태가 초기화되는 이유
 
@@ -432,27 +425,27 @@ useState를 사용하더라도 새로고침을 하면 상태가 사라집니다.
 
 브라우저를 새로고침하면 다음과 같은 일이 발생합니다.
 
--   JavaScript 실행 환경이 초기화된다
--   React 앱이 처음부터 다시 실행된다
--   모든 state가 초기값으로 돌아간다
+- JavaScript 실행 환경이 초기화된다
+- React 앱이 처음부터 다시 실행된다
+- 모든 state가 초기값으로 돌아간다
 
 예를 들어 다음 코드를 보겠습니다.
 
-```
+```js
 const [count, setCount] = useState(0);
 ```
 
-사용자가 버튼을 클릭해 count가 10이 되었더라도,  
+사용자가 버튼을 클릭해 count가 10이 되었더라도,
 새로고침을 하면 다시 0으로 돌아갑니다.
 
 이 상태는 브라우저 메모리에만 존재하기 때문입니다.
 
-만약 새로고침 이후에도 값을 유지하고 싶다면  
+만약 새로고침 이후에도 값을 유지하고 싶다면
 외부 저장소를 사용해야 합니다.
 
 하나의 예시로, localStorage를 사용할 수 있습니다.
 
-```
+```js
 const [count, setCount] = useState(() => {
   return Number(localStorage.getItem("count")) || 0;
 });
@@ -464,13 +457,13 @@ useEffect(() => {
 
 이렇게 하면 로컬스토리지를 활용하여 외부에서 저장된 값을 불러와 활용할 수 있기 때문에, 새로고침 이후에도 상태를 유지할 수 있습니다.
 
-* * *
+---
 
 ## useState를 활용한 객체와 배열 상태 관리
 
 useState는 상태를 병합하지 않고 전체를 교체합니다.
 
-```
+```js
 const [user, setUser] = useState({
   name: "홍길동",
   age: 20,
@@ -479,7 +472,7 @@ const [user, setUser] = useState({
 
 다음과 같이 작성하면 문제가 발생합니다.
 
-```
+```js
 setUser({ name: "김철수" });
 ```
 
@@ -487,7 +480,7 @@ setUser({ name: "김철수" });
 
 따라서 기존 상태를 유지하면서 업데이트해야 합니다.
 
-```
+```js
 setUser((prev) => ({
   ...prev,
   name: "김철수",
@@ -496,22 +489,22 @@ setUser((prev) => ({
 
 배열도 동일한 방식으로 처리합니다.
 
-```
+```js
 setList((prev) => [...prev, newItem]);
 ```
 
-* * *
+---
 
 ## 상태를 어떻게 나눌 것인가
 
 상태를 나누는 방식은 코드 구조에 큰 영향을 줍니다.
 
-```
+```js
 const [name, setName] = useState("");
 const [age, setAge] = useState(0);
 ```
 
-```
+```js
 const [user, setUser] = useState({
   name: "",
   age: 0,
@@ -520,28 +513,28 @@ const [user, setUser] = useState({
 
 두 방식 중 어떤 것이 더 좋은지는 상황에 따라 달라집니다.
 
--   함께 변경되는 값은 하나로 묶고
--   독립적으로 변경되는 값은 분리하는 것이 좋습니다.
+- 함께 변경되는 값은 하나로 묶고
+- 독립적으로 변경되는 값은 분리하는 것이 좋습니다.
 
-* * *
+---
 
 ## 파생 상태는 state로 관리하지 않는다
 
 다음과 같은 코드는 불필요한 상태를 만드는 예시입니다.
 
-```
+```js
 const [filtered, setFiltered] = useState([]);
 ```
 
 이 값은 다른 상태로부터 계산할 수 있습니다.
 
-```
+```js
 const filtered = data.filter((item) => item.active);
 ```
 
 이처럼 계산 가능한 값은 state로 두지 않는 것이 좋습니다.
 
-* * *
+---
 
 ## 그래서 useState를 언제 사용해야 하는가
 
@@ -549,40 +542,39 @@ const filtered = data.filter((item) => item.active);
 
 useState는 다음과 같은 상황에서 사용하는 것이 적합합니다.
 
--   입력값과 같이 사용자 인터랙션에 따라 변경되는 값
--   모달, 드롭다운과 같은 토글 상태
--   특정 컴포넌트 내부에서만 사용하는 단순한 UI 상태
+- 입력값과 같이 사용자 인터랙션에 따라 변경되는 값
+- 모달, 드롭다운과 같은 토글 상태
+- 특정 컴포넌트 내부에서만 사용하는 단순한 UI 상태
 
 즉, **컴포넌트 단위에서 독립적으로 관리할 수 있는 간단한 상태**에 적합합니다.
 
 반대로 다음과 같은 경우에는 useState보다 다른 방법을 사용하는 것이 더 적절합니다.
 
--   상태 변경 로직이 복잡한 경우 -> useReducer
--   서버로부터 받아오는 데이터 -> React Query
--   여러 컴포넌트에서 공유해야 하는 상태 -> Zustand
+- 상태 변경 로직이 복잡한 경우 -> useReducer
+- 서버로부터 받아오는 데이터 -> React Query
+- 여러 컴포넌트에서 공유해야 하는 상태 -> Zustand
 
 핵심 기준은 다음과 같습니다.
-
 > 이 상태가 단순하고, 특정 컴포넌트 내부에서만 관리되는가?
 
--   그렇다면 useState를 사용하고
--   그렇지 않다면 더 적절한 상태 관리 방법을 선택하는 것이 좋습니다.
+- 그렇다면 useState를 사용하고
+- 그렇지 않다면 더 적절한 상태 관리 방법을 선택하는 것이 좋습니다.
 
-* * *
+---
 
 ## 정리
 
-useState는 단순히 값을 저장하는 도구가 아닙니다.  
+useState는 단순히 값을 저장하는 도구가 아닙니다.
 useState는 상태를 통해 **렌더링을 제어하는 인터페이스**입니다.
 
 이 관점을 이해하면
 
--   불필요한 상태를 줄일 수 있고
--   렌더링 흐름을 명확하게 이해할 수 있으며
--   더 안정적인 컴포넌트를 설계할 수 있습니다.
+- 불필요한 상태를 줄일 수 있고
+- 렌더링 흐름을 명확하게 이해할 수 있으며
+- 더 안정적인 컴포넌트를 설계할 수 있습니다.
 
-useState는 가장 기본적인 Hook이지만,  
+useState는 가장 기본적인 Hook이지만,
 React를 깊게 이해하기 위한 가장 중요한 출발점입니다.
 
-다음 시간에는 useEffect에 대해 분석해보는 시간을 가져보도록 하겠습니다.  
+다음 시간에는 useEffect에 대해 분석해보는 시간을 가져보도록 하겠습니다.
 감사합니다!!
