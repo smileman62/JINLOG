@@ -1,17 +1,10 @@
 import type { BlogPost } from "@/lib/blog/types";
 import { categoryLabels } from "@/lib/blog/constants";
+import { formatDateLong } from "@/lib/blog/format";
 
 type BlogPostHeaderProps = {
   post: BlogPost;
 };
-
-function formatPublishedAt(isoDate: string) {
-  return new Date(`${isoDate}T12:00:00`).toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
 
 export function BlogPostHeader({ post }: BlogPostHeaderProps) {
   return (
@@ -24,7 +17,7 @@ export function BlogPostHeader({ post }: BlogPostHeaderProps) {
           dateTime={post.publishedAt}
           className="text-zinc-500 dark:text-zinc-400"
         >
-          {formatPublishedAt(post.publishedAt)}
+          {formatDateLong(post.publishedAt)}
         </time>
       </div>
       <div className="space-y-3">

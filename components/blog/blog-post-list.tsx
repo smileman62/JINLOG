@@ -1,18 +1,11 @@
 import type { BlogPost } from "@/lib/blog/types";
 import Link from "next/link";
 import { categoryLabels } from "@/lib/blog/constants";
+import { formatDateLong } from "@/lib/blog/format";
 
 type BlogPostListProps = {
   posts: BlogPost[];
 };
-
-function formatPublishedAt(isoDate: string) {
-  return new Date(`${isoDate}T12:00:00`).toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
 
 export function BlogPostList({ posts }: BlogPostListProps) {
   if (posts.length === 0) {
@@ -43,7 +36,7 @@ export function BlogPostList({ posts }: BlogPostListProps) {
             </p>
             <div className="mt-1 flex flex-wrap items-center gap-x-1 gap-y-1 text-sm text-zinc-500 dark:text-zinc-400">
               <time dateTime={post.publishedAt} className="text-sm">
-                {formatPublishedAt(post.publishedAt)}
+                {formatDateLong(post.publishedAt)}
               </time>
             </div>
             <p
