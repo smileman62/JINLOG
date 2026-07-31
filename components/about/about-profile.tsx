@@ -1,11 +1,16 @@
 import {
+  aboutActivity,
+  aboutCertificates,
   aboutContacts,
+  aboutEducation,
   aboutIntro,
+  aboutRewards,
   aboutStrengths,
-  aboutStudying,
-  aboutTimeline,
+  aboutTechStack,
 } from "@/lib/about/data";
+import type { AboutTimelineItem } from "@/lib/about/data";
 import { AboutAvatar } from "@/components/about/about-avatar";
+import enter from "@/components/blog/blog-enter.module.css";
 
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
@@ -15,23 +20,54 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
   );
 }
 
+function TimelineList({
+  items,
+  delayBase,
+}: {
+  items: AboutTimelineItem[];
+  delayBase: number;
+}) {
+  return (
+    <ul className="space-y-6">
+      {items.map((item, index) => (
+        <li
+          key={`${item.title}-${item.period}`}
+          className={`space-y-1.5 ${enter.enter}`}
+          style={{ animationDelay: `${delayBase + index * 0.05}s` }}
+        >
+          <p className="text-xs font-medium text-zinc-400 dark:text-zinc-500">
+            {item.period}
+          </p>
+          <h3 className="text-base font-bold text-foreground sm:text-lg">
+            {item.title}
+          </h3>
+          <p className="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+            {item.subtitle}
+          </p>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function AboutProfile() {
   return (
     <div className="mx-auto max-w-3xl space-y-16 pb-8 sm:space-y-20">
-      {/* 프로필: 사진 + 소개 */}
       <section className="flex flex-col items-center gap-8 sm:flex-row sm:items-start sm:gap-10">
         <AboutAvatar />
-        <div className="flex flex-col gap-4">
+        <div
+          className={`flex flex-col gap-4 ${enter.enter}`}
+          style={{ animationDelay: "0.12s" }}
+        >
           <div className="flex items-end gap-2">
-              <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                {aboutIntro.name}
-              </h1>
-              <p className="-mb-1 text-xl font-medium text-zinc-500 dark:text-zinc-400">
-                {aboutIntro.role}
-              </p>
-            </div>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+              {aboutIntro.name}
+            </h1>
+            <p className="-mb-1 text-xl font-medium text-zinc-500 dark:text-zinc-400">
+              {aboutIntro.role}
+            </p>
+          </div>
           <div className="min-w-0 flex-1 space-y-3 text-center sm:text-left">
-            
             {aboutIntro.paragraphs.map((paragraph) => (
               <p
                 key={paragraph.slice(0, 28)}
@@ -44,34 +80,61 @@ export function AboutProfile() {
         </div>
       </section>
 
-      {/* Education & Activity */}
-      <section className="space-y-8">
-        <SectionHeading>Education &amp; Activity</SectionHeading>
-        <ul className="space-y-8">
-          {aboutTimeline.map((item) => (
-            <li key={`${item.title}-${item.period}`} className="space-y-1.5">
-              <p className="text-xs font-medium text-zinc-400 dark:text-zinc-500">
-                {item.period}
-              </p>
-              <h3 className="text-base font-bold text-foreground sm:text-lg">
-                {item.title}
-              </h3>
-              <p className="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-                {item.subtitle}
+      <section
+        className={`space-y-8 ${enter.enter}`}
+        style={{ animationDelay: "0.2s" }}
+      >
+        <SectionHeading>Education</SectionHeading>
+        <TimelineList items={aboutEducation} delayBase={0.24} />
+      </section>
+
+      <section
+        className={`grid gap-10 sm:grid-cols-2 sm:gap-8 ${enter.enter}`}
+        style={{ animationDelay: "0.3s" }}
+      >
+        <div className="space-y-6">
+          <SectionHeading>Activity</SectionHeading>
+          <TimelineList items={aboutActivity} delayBase={0.34} />
+        </div>
+        <div className="space-y-6">
+          <SectionHeading>Reward</SectionHeading>
+          <TimelineList items={aboutRewards} delayBase={0.38} />
+        </div>
+      </section>
+
+      <section
+        className={`space-y-8 ${enter.enter}`}
+        style={{ animationDelay: "0.46s" }}
+      >
+        <SectionHeading>Certificates</SectionHeading>
+        <ul className="grid gap-4 sm:grid-cols-3">
+          {aboutCertificates.map((item, index) => (
+            <li
+              key={item.title}
+              className={`rounded-xl border border-zinc-200 px-4 py-4 dark:border-zinc-800 ${enter.enter}`}
+              style={{ animationDelay: `${0.5 + index * 0.05}s` }}
+            >
+              <p className="text-sm font-bold text-foreground">{item.title}</p>
+              <p className="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+                {item.status}
+                {item.period ? ` · ${item.period}` : ""}
               </p>
             </li>
           ))}
         </ul>
       </section>
 
-      {/* Strengths */}
-      <section className="space-y-8">
+      <section
+        className={`space-y-8 ${enter.enter}`}
+        style={{ animationDelay: "0.58s" }}
+      >
         <SectionHeading>Strengths</SectionHeading>
         <ul className="grid gap-5 sm:grid-cols-2 sm:gap-6">
-          {aboutStrengths.map((item) => (
+          {aboutStrengths.map((item, index) => (
             <li
               key={item.title}
-              className="rounded-xl bg-zinc-50 px-5 py-5 dark:bg-zinc-900/60"
+              className={`rounded-xl bg-zinc-50 px-5 py-5 dark:bg-zinc-900/60 ${enter.enter}`}
+              style={{ animationDelay: `${0.62 + index * 0.05}s` }}
             >
               <h3 className="text-sm font-bold text-foreground sm:text-base">
                 {item.title}
@@ -84,14 +147,17 @@ export function AboutProfile() {
         </ul>
       </section>
 
-      {/* Currently Studying */}
-      <section className="space-y-6">
-        <SectionHeading>Currently Studying</SectionHeading>
+      <section
+        className={`space-y-6 ${enter.enter}`}
+        style={{ animationDelay: "0.72s" }}
+      >
+        <SectionHeading>Tech Stack</SectionHeading>
         <ul className="flex flex-wrap gap-2.5">
-          {aboutStudying.map((item) => (
+          {aboutTechStack.map((item, index) => (
             <li
               key={item}
-              className="rounded-lg border border-zinc-200 bg-background px-3.5 py-1.5 text-sm font-medium text-zinc-700 dark:border-zinc-700 dark:text-zinc-300"
+              className={`rounded-lg border border-zinc-200 bg-background px-3.5 py-1.5 text-sm font-medium text-zinc-700 dark:border-zinc-700 dark:text-zinc-300 ${enter.enter}`}
+              style={{ animationDelay: `${0.76 + index * 0.03}s` }}
             >
               {item}
             </li>
@@ -99,14 +165,20 @@ export function AboutProfile() {
         </ul>
       </section>
 
-      {/* Contact */}
-      <section className="space-y-6 border-t border-zinc-200 pt-12 dark:border-zinc-800">
+      <section
+        className={`space-y-6 border-t border-zinc-200 pt-12 dark:border-zinc-800 ${enter.enter}`}
+        style={{ animationDelay: "0.88s" }}
+      >
         <h2 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
           <span className="text-zinc-400 dark:text-zinc-500">#</span> Contact
         </h2>
         <ul className="flex flex-wrap gap-3">
-          {aboutContacts.map(({ label, href }) => (
-            <li key={label}>
+          {aboutContacts.map(({ label, href }, index) => (
+            <li
+              key={label}
+              className={enter.enter}
+              style={{ animationDelay: `${0.92 + index * 0.04}s` }}
+            >
               <a
                 href={href}
                 target={href.startsWith("http") ? "_blank" : undefined}

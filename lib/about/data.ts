@@ -9,6 +9,12 @@ export type AboutStrength = {
   description: string;
 };
 
+export type AboutCertificate = {
+  title: string;
+  status: string;
+  period?: string;
+};
+
 export const aboutIntro = {
   name: "김진성",
   role: "Frontend Developer",
@@ -19,12 +25,15 @@ export const aboutIntro = {
   ],
 };
 
-export const aboutTimeline: AboutTimelineItem[] = [
+export const aboutEducation: AboutTimelineItem[] = [
   {
     period: "2022.03 — 2026.08 (졸업 예정)",
     title: "가천대학교 소프트웨어학과",
     subtitle: "GPA 4.1 / 4.5 · 학사 과정",
   },
+];
+
+export const aboutActivity: AboutTimelineItem[] = [
   {
     period: "2026.01 — 2026.03",
     title: "플래드랩스 · 마음모음",
@@ -33,12 +42,43 @@ export const aboutTimeline: AboutTimelineItem[] = [
   {
     period: "2025.09 — 2026.12",
     title: "가천대 카카오엔터프라이즈 SW 아카데미 7기",
-    subtitle: "기업실무형 프로젝트 · DKaffeine 우수팀 선정",
+    subtitle: "기업실무형 프로젝트 · DKaffeine 프론트엔드",
   },
   {
     period: "2025.04 — 2026.02",
     title: "UMC 8·9기 시니어 과정",
     subtitle: "University MakeUs Challenge · 팀 프로젝트 리딩",
+  },
+];
+
+export const aboutRewards: AboutTimelineItem[] = [
+  {
+    period: "2025.12",
+    title: "DKaffeine 우수팀 선정",
+    subtitle: "가천대 카카오엔터프라이즈 SW 아카데미 7기",
+  },
+  {
+    period: "2025.08",
+    title: "퍼퓨온미 최우수상",
+    subtitle: "UMC 프로젝트 · AI·설문 기반 향수 추천",
+  },
+];
+
+export const aboutCertificates: AboutCertificate[] = [
+  {
+    title: "정보처리기사",
+    status: "준비 중",
+    period: "2026",
+  },
+  {
+    title: "ADsP",
+    status: "취득",
+    period: "2024",
+  },
+  {
+    title: "SQLD",
+    status: "취득",
+    period: "2024",
   },
 ];
 
@@ -75,16 +115,22 @@ export const aboutStrengths: AboutStrength[] = [
   },
 ];
 
-export const aboutStudying = [
+export const aboutTechStack = [
   "React",
   "Next.js",
   "TypeScript",
-  "React Native",
+  "JavaScript",
   "TanStack Query",
   "Zustand",
-  "정보처리기사",
-  "ADsP",
-  "SQLD",
+  "React Hook Form",
+  "Axios",
+  "Context API",
+  "WebSocket",
+  "Vite",
+  "Recharts",
+  "Tailwind CSS",
+  "CSS Modules",
+  "React Native",
 ];
 
 export const aboutContacts = [

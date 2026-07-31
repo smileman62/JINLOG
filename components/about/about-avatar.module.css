@@ -18,5 +18,7 @@
 @media (prefers-reduced-motion: reduce) {
   .avatar {
     animation: none;
+    opacity: 1;
+    transform: none;
   }
 }
