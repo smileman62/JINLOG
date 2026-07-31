@@ -63,6 +63,11 @@ export const metadata: Metadata = {
     locale: "ko_KR",
     type: "website",
   },
+  icons: {
+    icon: [{ url: "/SiteIcon.png", type: "image/png" }],
+    apple: [{ url: "/SiteIcon.png", type: "image/png" }],
+    shortcut: "/SiteIcon.png",
+  },
   twitter: {
     card: "summary_large_image",
     title: `${siteName} | 김진성 프론트엔드 개발자`,
