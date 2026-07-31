@@ -1,0 +1,9 @@
+{
+  "cssModules.pathAlias": {
+    "@": "${workspaceFolder}",
+    "@/*": "${workspaceFolder}/*"
+  },
+  "css.peek.moduleSupport": true,
+  "CSSNavigation.enableGoToDefinition": true,
+  "editor.gotoLocation.multipleDefinitions": "goto"
+}
