@@ -3,13 +3,19 @@ import type { BlogCategoryFilter, BlogPost, PostCategory } from "./types";
 
 export { categoryHeroImage, categoryLabels, POSTS_PER_PAGE } from "./constants";
 
+const CATEGORY_PRIORITY: PostCategory[] = [
+  "retrospective",
+  "python",
+  "nextjs",
+  "react",
+];
+
 function inferCategory(tags: string[]): PostCategory {
-  const loweredTags = tags.map((tag) => tag.toLowerCase());
-  const firstMatched = loweredTags.find(
-    (tag): tag is PostCategory => tag === "react" || tag === "nextjs",
+  const loweredTags = new Set(tags.map((tag) => tag.toLowerCase()));
+  const matched = CATEGORY_PRIORITY.find((category) =>
+    loweredTags.has(category),
   );
-  if (firstMatched) return firstMatched;
-  return "react";
+  return matched ?? "react";
 }
 
 function toBlogPosts(): BlogPost[] {
@@ -30,11 +36,8 @@ function toBlogPosts(): BlogPost[] {
     );
 }
 
-let cachedPosts: BlogPost[] | null = null;
-
 export function getAllPosts(): BlogPost[] {
-  cachedPosts ??= toBlogPosts();
-  return cachedPosts;
+  return toBlogPosts();
 }
 
 export function filterPostsByCategory(
@@ -48,7 +51,14 @@ export function filterPostsByCategory(
 }
 
 export function parseCategoryFilter(value: string | undefined): BlogCategoryFilter {
-  if (value === "react" || value === "nextjs") return value;
+  if (
+    value === "react" ||
+    value === "nextjs" ||
+    value === "python" ||
+    value === "retrospective"
+  ) {
+    return value;
+  }
   return "all";
 }
 

@@ -6,6 +6,8 @@ const tabs: { key: BlogCategoryFilter; query: string }[] = [
   { key: "all", query: "all" },
   { key: "react", query: "react" },
   { key: "nextjs", query: "nextjs" },
+  { key: "python", query: "python" },
+  { key: "retrospective", query: "retrospective" },
 ];
 
 type BlogCategoryTabsProps = {

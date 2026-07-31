@@ -1,4 +1,8 @@
-export type PostCategory = "react" | "nextjs";
+export type PostCategory =
+  | "react"
+  | "nextjs"
+  | "python"
+  | "retrospective";
 
 export type BlogCategoryFilter = "all" | PostCategory;
 
