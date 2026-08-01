@@ -160,16 +160,20 @@ export function HomeProfile() {
           </div>
           <div className="mt-2 space-y-2">
             <div>
+              <p className="text-sm font-bold text-zinc-900 md:text-base lg:text-lg">NOVA</p>
+              <p className="text-xs text-zinc-700/70 md:text-sm lg:text-base">AI 트렌드 인사이트 플랫폼</p>
+            </div>
+            <div>
               <p className="text-sm font-bold text-zinc-900 md:text-base lg:text-lg">마음모음</p>
               <p className="text-xs text-zinc-700/70 md:text-sm lg:text-base">멘탈 헬스케어 서비스</p>
             </div>
             <div>
               <p className="text-sm font-bold text-zinc-900 md:text-base lg:text-lg">DKaffeine</p>
-              <p className="text-xs text-zinc-700/70 md:text-sm lg:text-base">RAG 기반 챗봇 관리자 플랫폼</p>
+              <p className="text-xs text-zinc-700/70 md:text-sm lg:text-base">RAG 기반 챗봇 통합 관리 플랫폼</p>
             </div>
             <div>
               <p className="text-sm font-bold text-zinc-900 md:text-base lg:text-lg">MCP Hub</p>
-              <p className="text-xs text-zinc-700/70 md:text-sm lg:text-base">MCP 통합 탐색 & 실행 플랫폼</p>
+              <p className="text-xs text-zinc-700/70 md:text-sm lg:text-base">MCP 탐색 · 체험 · 공유 통합 플랫폼</p>
             </div>
             <div>
               <p className="text-sm font-bold text-zinc-900 md:text-base lg:text-lg">퍼퓨온미</p>
