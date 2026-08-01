@@ -119,8 +119,8 @@ function ProjectGridCard({
         src={cover}
         alt=""
         fill
-        sizes="(max-width: 1023px) 50vw, 0px"
-        className="object-cover transition-transform duration-300 group-hover:scale-[1.04]"
+        sizes="(max-width: 1023px) 100vw, 0px"
+        className="object-cover object-center transition-transform duration-300 group-hover:scale-[1.04]"
       />
       <div
         aria-hidden
@@ -212,7 +212,7 @@ export function ProjectsShowcase({ projects }: ProjectsShowcaseProps) {
         </h1>
       </header>
 
-      <div className="grid grid-cols-2 gap-[12px] sm:gap-[16px] lg:hidden">
+      <div className="grid grid-cols-1 gap-[12px] sm:gap-[16px] lg:hidden">
         {projects.map((item, index) => (
           <div
             key={item.id}
@@ -232,10 +232,10 @@ export function ProjectsShowcase({ projects }: ProjectsShowcaseProps) {
           className={`overflow-hidden rounded-[28px] border border-zinc-200/80 bg-white shadow-[0_20px_60px_rgba(15,15,15,0.08)] dark:border-zinc-800 dark:bg-zinc-950 dark:shadow-[0_20px_60px_rgba(0,0,0,0.35)] ${enter.enter}`}
           style={{ animationDelay: "0.12s" }}
         >
-          <div className="flex min-h-[480px]">
-            <div className="flex min-w-0 flex-1 flex-col">
+          <div className="flex items-stretch">
+            <div className="flex w-[700px] shrink-0 flex-col xl:w-[800px]">
               <div
-                className={`relative min-h-[480px] flex-1 transition-opacity duration-300 ${
+                className={`relative aspect-video w-full overflow-hidden bg-zinc-100 transition-opacity duration-300 dark:bg-zinc-900 ${
                   imageReady ? "opacity-100" : "opacity-0"
                 }`}
               >
@@ -245,8 +245,8 @@ export function ProjectsShowcase({ projects }: ProjectsShowcaseProps) {
                   alt={`${project.title} \uB300\uD45C \uC774\uBBF8\uC9C0`}
                   fill
                   priority
-                  sizes="(min-width: 1024px) 800px, 100vw"
-                  className="object-cover"
+                  sizes="(min-width: 1280px) 760px, 700px"
+                  className="object-cover object-center"
                 />
               </div>
 
@@ -281,7 +281,7 @@ export function ProjectsShowcase({ projects }: ProjectsShowcaseProps) {
               </div>
             </div>
 
-            <div className="flex w-[400px] shrink-0 flex-col bg-white p-[48px] dark:bg-zinc-950">
+            <div className="flex min-w-0 flex-1 flex-col bg-white p-[48px] dark:bg-zinc-950">
               <div>
                 <p className="text-[13px] font-bold tracking-[0.08em] text-[#0EA5E9]">
                   {padIndex(activeIndex)} / {String(count).padStart(2, "0")}
