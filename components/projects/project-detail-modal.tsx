@@ -130,40 +130,39 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
         role="dialog"
         aria-modal="true"
         aria-labelledby="project-detail-title"
-        className={`relative z-10 my-auto w-full max-w-[760px] overflow-hidden rounded-[28px] bg-white shadow-[0_40px_90px_-30px_rgba(0,0,0,0.45)] dark:bg-zinc-950 ${enter.enterModal}`}
+        className={`relative z-10 my-auto w-full max-w-[860px] overflow-hidden rounded-[28px] bg-zinc-50 shadow-[0_40px_90px_-30px_rgba(0,0,0,0.45)] dark:bg-zinc-950 ${enter.enterModal}`}
       >
         <button
           type="button"
           aria-label="닫기"
           onClick={onClose}
-          className="absolute top-[16px] right-[16px] z-20 flex h-[40px] w-[40px] items-center justify-center rounded-full bg-white text-zinc-900 shadow-[0_6px_18px_rgba(0,0,0,0.16)] dark:bg-zinc-900 dark:text-zinc-50"
+          className="absolute top-[16px] right-[16px] z-20 flex h-[40px] w-[40px] items-center justify-center rounded-full bg-white text-zinc-900 shadow-[0_6px_18px_rgba(0,0,0,0.16)] transition-colors hover:bg-zinc-100 hover:text-zinc-950 active:bg-zinc-200 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800 dark:hover:text-white dark:active:bg-zinc-700"
         >
           <CloseIcon />
         </button>
 
         <div className="max-h-[88vh] overflow-y-auto">
-          <header className="px-[20px] pt-[56px] pb-[22px] sm:px-[40px] sm:pt-[40px] sm:pb-[28px]">
-            <p className="mb-[14px] text-[12.5px] font-semibold tracking-[0.02em] text-zinc-500">
-              {project.subtitle}
-            </p>
-
-            <div className="flex flex-wrap items-start justify-between gap-[24px]">
-              <div className="min-w-0 max-w-[46ch]">
+          <header className="px-[20px] pt-[64px] pb-[22px] sm:px-[40px] sm:pt-[50px] sm:pb-[28px]">
+            <div className="flex flex-col gap-[12px]">
+              <div className="min-w-0 pr-[48px]">
                 <h2
                   id="project-detail-title"
-                  className="break-keep text-[26px] font-extrabold leading-[1.2] tracking-[-0.01em] text-zinc-900 sm:text-[34px] dark:text-zinc-50"
+                  className="break-keep text-[32px] font-extrabold leading-[1.15] tracking-[-0.02em] text-zinc-900 sm:text-[42px] dark:text-zinc-50"
                 >
                   {project.title}
                 </h2>
+                <p className="mt-[4px] break-keep text-[14px] font-medium leading-[1.55] text-zinc-500 sm:text-[15.5px]">
+                  {project.subtitle}
+                </p>
               </div>
 
-              <div className="flex w-full gap-[8px] sm:w-auto">
+              <div className="flex justify-end w-full gap-[8px]">
                 {hasGithub ? (
                   <a
                     href={github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex flex-1 items-center justify-center gap-[6px] rounded-full border border-zinc-200 px-[16px] py-[10px] text-[13.5px] font-semibold text-zinc-900 sm:flex-none dark:border-zinc-700 dark:text-zinc-50"
+                    className="inline-flex flex-1 items-center justify-center gap-[6px] rounded-full border border-zinc-200 px-[16px] py-[10px] text-[13.5px] font-semibold text-zinc-900 transition-colors hover:bg-zinc-100 active:bg-zinc-200 sm:flex-none dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-800 dark:active:bg-zinc-700"
                   >
                     GitHub
                   </a>
@@ -180,7 +179,7 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
                     href={demo}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex flex-1 items-center justify-center gap-[6px] rounded-full bg-zinc-900 px-[16px] py-[10px] text-[13.5px] font-semibold text-white sm:flex-none dark:bg-zinc-100 dark:text-zinc-900"
+                    className="inline-flex flex-1 items-center justify-center gap-[6px] rounded-full bg-zinc-900 px-[16px] py-[10px] text-[13.5px] font-semibold text-white transition-colors hover:bg-zinc-800 active:bg-zinc-700 sm:flex-none dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 dark:active:bg-zinc-300"
                   >
                     배포 사이트
                   </a>
@@ -196,14 +195,14 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
             </div>
           </header>
 
-          <div className="relative mx-[20px] mb-[24px] h-[280px] overflow-hidden rounded-[16px] sm:mx-[40px] sm:mb-[32px] sm:h-[340px]">
+          <div className="group relative mx-[20px] mb-[24px] aspect-video overflow-hidden rounded-[16px] sm:mx-[40px] sm:mb-[32px]">
             <Image
               key={currentImage}
               src={currentImage}
               alt={`${project.title} 이미지 ${imageIndex + 1}`}
               fill
               sizes="(max-width: 760px) 100vw, 760px"
-              className="object-cover"
+              className="object-cover object-center"
               priority
             />
 
@@ -213,24 +212,22 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
                   {padIndex(imageIndex)} / {String(imageCount).padStart(2, "0")}
                 </div>
 
-                <div className="absolute right-[14px] bottom-[14px] z-10 flex gap-[8px]">
-                  <button
-                    type="button"
-                    aria-label="이전 이미지"
-                    onClick={goPrevImage}
-                    className="flex h-[36px] w-[36px] items-center justify-center rounded-full bg-white/90 text-zinc-900 shadow-sm transition-transform hover:scale-105"
-                  >
-                    <ChevronLeftIcon />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="다음 이미지"
-                    onClick={goNextImage}
-                    className="flex h-[36px] w-[36px] items-center justify-center rounded-full bg-white/90 text-zinc-900 shadow-sm transition-transform hover:scale-105"
-                  >
-                    <ChevronRightIcon />
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  aria-label="이전 이미지"
+                  onClick={goPrevImage}
+                  className="absolute top-1/2 left-[12px] z-10 flex h-[40px] w-[40px] -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-zinc-900 shadow-sm opacity-100 transition-[opacity,transform,background-color,color] hover:bg-zinc-100 hover:text-zinc-950 active:scale-95 active:bg-zinc-200 sm:opacity-0 sm:group-hover:opacity-100 dark:bg-zinc-900/90 dark:text-zinc-50 dark:hover:bg-zinc-800 dark:active:bg-zinc-700"
+                >
+                  <ChevronLeftIcon />
+                </button>
+                <button
+                  type="button"
+                  aria-label="다음 이미지"
+                  onClick={goNextImage}
+                  className="absolute top-1/2 right-[12px] z-10 flex h-[40px] w-[40px] -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-zinc-900 shadow-sm opacity-100 transition-[opacity,transform,background-color,color] hover:bg-zinc-100 hover:text-zinc-950 active:scale-95 active:bg-zinc-200 sm:opacity-0 sm:group-hover:opacity-100 dark:bg-zinc-900/90 dark:text-zinc-50 dark:hover:bg-zinc-800 dark:active:bg-zinc-700"
+                >
+                  <ChevronRightIcon />
+                </button>
               </>
             ) : null}
           </div>
@@ -365,7 +362,7 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
               <h3 className="mb-[16px] text-[17px] font-bold tracking-[-0.01em] text-zinc-800 dark:text-zinc-100">
                 프로젝트 후기
               </h3>
-              <div className="rounded-r-[10px] border-l-[3px] border-zinc-400 bg-zinc-50 px-[24px] py-[20px] dark:border-zinc-500 dark:bg-zinc-900">
+              <div className="rounded-r-[10px] border-l-[3px] border-zinc-400 bg-white px-[24px] py-[20px] dark:border-zinc-500 dark:bg-zinc-900">
                 <div className="space-y-[10px]">
                   {retrospectives.map((paragraph) => (
                     <p
