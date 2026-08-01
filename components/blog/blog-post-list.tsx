@@ -27,9 +27,7 @@ export function BlogPostList({ posts }: BlogPostListProps) {
               </span>
             </div>
             <h2 className="mt-3 text-lg font-semibold leading-snug text-foreground">
-              <Link href={`/blog/${post.slug}`} className="hover:underline">
-                {post.title}
-              </Link>
+              {post.title}
             </h2>
             <p className="mt-2 line-clamp-2 text-sm text-zinc-600 dark:text-zinc-300">
               {post.description}
@@ -39,12 +37,12 @@ export function BlogPostList({ posts }: BlogPostListProps) {
                 {formatDateLong(post.publishedAt)}
               </time>
             </div>
-            <p
-              className="pointer-events-none absolute bottom-6 right-0 whitespace-nowrap text-[11px] font-medium leading-none text-sky-600 opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:text-xs dark:text-sky-400"
-              aria-hidden
+            <Link
+              href={`/blog/${post.slug}`}
+              className="absolute bottom-6 right-0 whitespace-nowrap text-[11px] font-medium leading-none text-sky-600 transition-opacity duration-200 hover:underline sm:opacity-0 sm:group-hover:opacity-100 sm:text-xs dark:text-sky-400"
             >
               자세히 보기<span className="ml-0.5">&gt;</span>
-            </p>
+            </Link>
           </article>
         </li>
       ))}
