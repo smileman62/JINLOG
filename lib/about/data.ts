@@ -67,8 +67,8 @@ export const aboutRewards: AboutTimelineItem[] = [
 export const aboutCertificates: AboutCertificate[] = [
   {
     title: "정보처리기사",
-    status: "준비 중",
-    period: "2026",
+    status: "취득",
+    period: "2024",
   },
   {
     title: "ADsP",
