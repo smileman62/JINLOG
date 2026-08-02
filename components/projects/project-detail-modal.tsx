@@ -96,7 +96,7 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
     };
   }, [onClose, imageCount]);
 
-  const github = project.github ?? project.link;
+  const github = project.github;
   const demo = project.demo;
   const hasGithub = Boolean(github);
   const hasDemo = Boolean(demo);
@@ -156,42 +156,30 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
                 </p>
               </div>
 
-              <div className="flex justify-end w-full gap-[8px]">
-                {hasGithub ? (
-                  <a
-                    href={github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex flex-1 items-center justify-center gap-[6px] rounded-full border border-zinc-200 px-[16px] py-[10px] text-[13.5px] font-semibold text-zinc-900 transition-colors hover:bg-zinc-100 active:bg-zinc-200 sm:flex-none dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-800 dark:active:bg-zinc-700"
-                  >
-                    GitHub
-                  </a>
-                ) : (
-                  <span
-                    aria-disabled="true"
-                    className="inline-flex flex-1 cursor-not-allowed items-center justify-center gap-[6px] rounded-full border border-zinc-200 px-[16px] py-[10px] text-[13.5px] font-semibold text-zinc-400 opacity-50 sm:flex-none dark:border-zinc-800 dark:text-zinc-600"
-                  >
-                    GitHub
-                  </span>
-                )}
-                {hasDemo ? (
-                  <a
-                    href={demo}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex flex-1 items-center justify-center gap-[6px] rounded-full bg-zinc-900 px-[16px] py-[10px] text-[13.5px] font-semibold text-white transition-colors hover:bg-zinc-800 active:bg-zinc-700 sm:flex-none dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 dark:active:bg-zinc-300"
-                  >
-                    배포 사이트
-                  </a>
-                ) : (
-                  <span
-                    aria-disabled="true"
-                    className="inline-flex flex-1 cursor-not-allowed items-center justify-center gap-[6px] rounded-full bg-zinc-300 px-[16px] py-[10px] text-[13.5px] font-semibold text-zinc-500 opacity-60 sm:flex-none dark:bg-zinc-800 dark:text-zinc-500"
-                  >
-                    배포 사이트
-                  </span>
-                )}
-              </div>
+              {hasGithub || hasDemo ? (
+                <div className="flex justify-end w-full gap-[8px]">
+                  {hasGithub ? (
+                    <a
+                      href={github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex flex-1 items-center justify-center gap-[6px] rounded-full border border-zinc-200 px-[16px] py-[10px] text-[13.5px] font-semibold text-zinc-900 transition-colors hover:bg-zinc-100 active:bg-zinc-200 sm:flex-none dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-800 dark:active:bg-zinc-700"
+                    >
+                      GitHub
+                    </a>
+                  ) : null}
+                  {hasDemo ? (
+                    <a
+                      href={demo}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex flex-1 items-center justify-center gap-[6px] rounded-full bg-zinc-900 px-[16px] py-[10px] text-[13.5px] font-semibold text-white transition-colors hover:bg-zinc-800 active:bg-zinc-700 sm:flex-none dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 dark:active:bg-zinc-300"
+                    >
+                      배포 사이트
+                    </a>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
           </header>
 

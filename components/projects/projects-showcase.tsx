@@ -127,12 +127,12 @@ function ProjectGridCard({
         className="absolute inset-0 bg-linear-to-t from-black/80 via-black/35 to-black/10"
       />
       <div className="absolute inset-x-0 bottom-0 z-10 p-[14px] sm:p-[18px]">
-        <p className="break-keep text-[11px] font-medium leading-snug text-white/80 sm:text-[12px]">
-          {project.subtitle}
-        </p>
-        <h2 className="mt-[4px] break-keep text-[15px] font-extrabold leading-tight tracking-[-0.02em] text-white sm:text-[18px]">
+        <h2 className="break-keep text-[15px] font-extrabold leading-tight tracking-[-0.02em] text-white sm:text-[18px]">
           {project.title}
         </h2>
+        <p className="mt-[4px] break-keep text-[11px] font-medium leading-snug text-white/80 sm:text-[12px]">
+          {project.subtitle}
+        </p>
         <div className="mt-[10px] flex flex-wrap gap-[6px]">
           <span className="inline-flex items-center gap-[5px] rounded-full bg-white/20 px-[10px] py-[5px] text-[10px] font-medium text-white backdrop-blur-sm sm:text-[11px]">
             <CalendarIcon />
@@ -154,6 +154,7 @@ export function ProjectsShowcase({ projects }: ProjectsShowcaseProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [imageReady, setImageReady] = useState(true);
+  const [panelReady, setPanelReady] = useState(true);
   const [detailOpen, setDetailOpen] = useState(false);
   const [thumbWindowStart, setThumbWindowStart] = useState(0);
 
@@ -173,9 +174,15 @@ export function ProjectsShowcase({ projects }: ProjectsShowcaseProps) {
 
   useEffect(() => {
     setImageReady(false);
-    const timer = window.setTimeout(() => setImageReady(true), 20);
+    const timer = window.setTimeout(() => setImageReady(true), 40);
     return () => window.clearTimeout(timer);
   }, [selectedImage]);
+
+  useEffect(() => {
+    setPanelReady(false);
+    const timer = window.setTimeout(() => setPanelReady(true), 40);
+    return () => window.clearTimeout(timer);
+  }, [activeIndex]);
 
   useEffect(() => {
     setThumbWindowStart((start) => {
@@ -235,7 +242,7 @@ export function ProjectsShowcase({ projects }: ProjectsShowcaseProps) {
           <div className="flex items-stretch">
             <div className="flex w-[700px] shrink-0 flex-col xl:w-[800px]">
               <div
-                className={`relative aspect-video w-full overflow-hidden bg-zinc-100 transition-opacity duration-300 dark:bg-zinc-900 ${
+                className={`relative aspect-video w-full overflow-hidden bg-zinc-100 transition-opacity duration-200 ease-out dark:bg-zinc-900 ${
                   imageReady ? "opacity-100" : "opacity-0"
                 }`}
               >
@@ -250,7 +257,11 @@ export function ProjectsShowcase({ projects }: ProjectsShowcaseProps) {
                 />
               </div>
 
-              <div className="border-t border-zinc-100 bg-white px-[20px] py-[12px] dark:border-zinc-800 dark:bg-zinc-950">
+              <div
+                className={`border-t border-zinc-100 bg-white px-[20px] py-[12px] transition-opacity duration-200 ease-out dark:border-zinc-800 dark:bg-zinc-950 ${
+                  panelReady ? "opacity-100" : "opacity-0"
+                }`}
+              >
                 <div className="flex justify-start gap-[8px] overflow-x-auto pb-[2px]">
                   {project.images.map((image, index) => {
                     const isActive = index === selectedImageIndex;
@@ -282,7 +293,13 @@ export function ProjectsShowcase({ projects }: ProjectsShowcaseProps) {
             </div>
 
             <div className="flex min-w-0 flex-1 flex-col bg-white p-[48px] dark:bg-zinc-950">
-              <div>
+              <div
+                className={`transition-[opacity,transform] duration-200 ease-out ${
+                  panelReady
+                    ? "translate-y-0 opacity-100"
+                    : "translate-y-1 opacity-0"
+                }`}
+              >
                 <p className="text-[13px] font-bold tracking-[0.08em] text-[#0EA5E9]">
                   {padIndex(activeIndex)} / {String(count).padStart(2, "0")}
                 </p>
@@ -291,8 +308,8 @@ export function ProjectsShowcase({ projects }: ProjectsShowcaseProps) {
                   {project.title}
                 </h2>
 
-                <p className="mt-[14px] break-keep text-[16px] leading-[1.65] text-zinc-600 dark:text-zinc-300">
-                  {project.description}
+                <p className="mt-[8px] break-keep text-[18px] font-medium leading-snug text-zinc-500 dark:text-zinc-400">
+                  {project.subtitle}
                 </p>
 
                 <ProjectTagChips key={project.id} tags={project.tags} />
@@ -301,7 +318,9 @@ export function ProjectsShowcase({ projects }: ProjectsShowcaseProps) {
               <button
                 type="button"
                 onClick={() => openDetail()}
-                className="mt-auto inline-flex w-fit items-center gap-[8px] rounded-full bg-zinc-900 px-[22px] py-[12px] text-[14px] font-bold text-white transition-transform duration-200 hover:scale-[1.03] dark:bg-zinc-100 dark:text-zinc-900"
+                className={`mt-auto inline-flex w-fit items-center gap-[8px] rounded-full bg-zinc-900 px-[22px] py-[12px] text-[14px] font-bold text-white transition-[transform,opacity] duration-200 ease-out hover:scale-[1.03] dark:bg-zinc-100 dark:text-zinc-900 ${
+                  panelReady ? "opacity-100" : "opacity-0"
+                }`}
               >
                 {"\uC790\uC138\uD788 \uBCF4\uAE30 \u2192"}
               </button>
