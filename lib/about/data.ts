@@ -35,32 +35,48 @@ export const aboutEducation: AboutTimelineItem[] = [
 
 export const aboutActivity: AboutTimelineItem[] = [
   {
-    period: "2026.01 — 2026.03",
-    title: "플래드랩스 · 마음모음",
-    subtitle: "Frontend Developer — 앱·백오피스 개발",
+    period: "2024.06 — 2024.12",
+    title: "ISSR Lab. 5기 연구원",
+    subtitle: "연구보조 및 2024 서울시 AIoT 해커톤 대회 참가",
+  },
+  {
+    period: "2025.04 — 2025.08",
+    title: "UMC 8기 Web 파트 시니어 과정",
+    subtitle: "University MakeUs Challenge · 데모데이 프로젝트 리딩",
   },
   {
     period: "2025.09 — 2026.12",
     title: "가천대 카카오엔터프라이즈 SW 아카데미 7기",
-    subtitle: "기업실무형 프로젝트 · DKaffeine 프론트엔드",
+    subtitle: "기업실무형 프로젝트 · MCPHUB 프론트엔드, DKaffeine 프론트엔드",
   },
   {
-    period: "2025.04 — 2026.02",
-    title: "UMC 8·9기 시니어 과정",
-    subtitle: "University MakeUs Challenge · 팀 프로젝트 리딩",
+    period: "2025.10 — 2026.02",
+    title: "UMC 9기 Web 파트 시니어 과정",
+    subtitle: "University MakeUs Challenge · 데모데이 프로젝트 리딩",
+  },
+  {
+    period: "2026.01 — 2026.03",
+    title: "플래드랩스 · 마음모음",
+    subtitle: "Frontend Developer — 앱·백오피스 개발",
   },
 ];
 
 export const aboutRewards: AboutTimelineItem[] = [
   {
-    period: "2025.12",
-    title: "DKaffeine 우수팀 선정",
-    subtitle: "가천대 카카오엔터프라이즈 SW 아카데미 7기",
+    period: "2024.10",
+    title: "2024 서울시 AIoT 해커톤 대회 장려상",
+    subtitle: "ISSR Lab. 5기 연구원",
   },
   {
     period: "2025.08",
     title: "퍼퓨온미 최우수상",
     subtitle: "UMC 프로젝트 · AI·설문 기반 향수 추천",
+  },
+  {
+    period: "2025.12",
+    title:
+      "과학기술정보통신부 대학/기업협력형 SW아카데미 가천대 카카오엔터프라이즈 SW아카데미 표창장",
+    subtitle: "가천대 카카오엔터프라이즈 SW 아카데미 7기",
   },
 ];
 
